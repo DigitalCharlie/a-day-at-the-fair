@@ -6,33 +6,55 @@ body {
     margin:0;
     display:flex;
     color:#ffffff;
-    font-size:1.2em;
+    font-size:1.3em;
     font-family: fantasy;
-}
-
-/* #top-image {
     background: black url(img/town-day.jpg) no-repeat fixed;
     background-size:100%;
-    background-position:bottom;
-    width:100vw;
-    height:70vh;
-}
-
-#text-adventure {
-    background-color:#111111;
-    width:100vw;
-    height:30vh;
-    display:flex;
-    justify-content: center;
-} */
-
-body {
-    background: black url(img/town-day.jpg) no-repeat fixed;
-    background-size:100%;
-    background-position:bottom;
+    background-position:top;
     width:100vw;
     height:100vh;
     flex-direction: column-reverse;
+}
+
+h1 {
+    text-align:center;
+    font-size:2em;
+    margin:0;
+}
+
+#intro {
+    text-align: center;;
+}
+
+#intro p:nth-of-type(2) {
+    display:inline;
+}
+
+input {
+    height:35px;
+    margin: 0 5px 0 10px;
+    padding-top:5px;
+}
+
+input[type="text"] {
+    font-size:.8em;
+    font-family:fantasy;
+}
+
+
+#intro button {
+    height:35px;
+    padding:4px 10px 0;
+    margin: 0
+}
+
+#intro hr {
+    width:50%;
+    margin: 30px auto;
+}
+
+.small-text {
+    font-size:.7em;
 }
 
 
@@ -43,13 +65,9 @@ body {
     justify-content: space-around;
     align-items:center;
     padding:40px 15%;
-    background-color:rgba(0,0,0,.85);
+    background-color:rgba(0,0,0,.8);
     border-radius:20px 20px;
     margin: 0 20px 20px
-}
-
-#text-adventure article {
-    max-width: 70%;
 }
 
 #current-options {
@@ -58,9 +76,28 @@ body {
 }
 
 button {
-    margin: 0 5px;
+    margin: 2px 5px;
     cursor:pointer;
     font-family: fantasy;
     font-size:.8em;
     padding:10px 15px 5px;
+}
+
+@media (max-width:600px) {
+    body {
+        font-size:.8em;
+    }
+    #text-adventure {
+        width:90vw;
+        height:70vh;
+        margin:0;
+        background:black;
+        border-radius: 0;
+        padding:1vh 5vw;
+        justify-content:space-between;
+    }
+    #current-options {
+        flex-direction: column;
+        margin-top:10px;
+    }
 }

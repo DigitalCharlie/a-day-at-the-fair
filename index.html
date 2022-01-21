@@ -9,14 +9,20 @@
 </head>
 <body>
     <main>
-        <section id="top-image">
-        </section>
         <section id="text-adventure">
-            <p id="current-text">The crow of a rooster awakens you from slumber, followed by the sound of a brass band cranking up. "Roll up! Roll up for the Pudding Faire!” cries a voice from the street below. Peering out the inn’s window, you see a crowd of happy halflings and gnomes bustling toward a fairground on the village green. It is seven o’clock in he morning on the day of the annual Honeypuddle Pudding Faire!</p>
-            <div id="current-options">
-                <button>Roll over and try to sleep</button>
+            <div id="intro">
+                <h1>Welcome to the Pudding Faire!</h1>
+                <p>Eat, drink and be merry — for there's no other day quite like this one... Right?</p>
+
+                <p>What is thy name, adventurer?</p><input type="text" id="adventurer-name"><button id="intro-button">Submit</button>
+                <hr>
+                <p class="small-text">A Day at the Fair is a simple adventure game based on Will Doyle's D&D 5e module, "The Pudding Faire."<br> Throughout the game you will prompted with text, then given a few options to choose from. Click the option you want to pursue, and see the results of your actions.</p>
+            </div>
+            <p id="current-text" hidden>The crow of a rooster awakens you from slumber, followed by the sound of a brass band cranking up. "Roll up! Roll up for the Pudding Faire!” cries a voice from the street below. Peering out the inn’s window, you see a crowd of happy halflings and gnomes bustling toward a fairground on the village green. It is seven o’clock in he morning on the day of the annual Honeypuddle Pudding Faire!</p>
+            <div id="current-options" style="display:none;">
+                <button>Go back to bed</button>
                 <button>Dash off to the fair</button>
-                <button>Observe from the window</button>
+                <button>Observe for a few minutes</button>
                 <button>Try to remember your dreams</button>
             </div>
         </section>
