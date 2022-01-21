@@ -1,12 +1,19 @@
 let adventurer = ""
 
+const body = document.body
+
 const intro = document.getElementById('intro')
 const nameAdvBtn = document.getElementById('intro-button')
 const nameInput = document.getElementById('adventurer-name')
 
+const textBox = document.getElementById('text-adventure')
 const currentText = document.getElementById('current-text')
 const options = document.getElementById('current-options')
 
+// FADE IN THE SCREEN IN STAGES
+
+body.classList.add('fade-in')
+textBox.classList.add('fade-in')
 
 // NAME YOURSELF AND THEN START THE GAME
 

@@ -4,6 +4,18 @@
 
 body {
     margin:0;
+    opacity:0;
+}
+
+.fade-in {
+    opacity: 1!important;
+    transition-duration: 2.5s;
+}
+
+#text-adventure {
+    opacity:0;
+    transition-duration: 2.5s;
+    transition-delay: 2s;
 }
 
 main {
@@ -22,7 +34,7 @@ main {
 
 h1 {
     text-align:center;
-    font-size:2em;
+    font-size:2.5em;
     margin:0;
 }
 
@@ -63,15 +75,26 @@ input[type="text"] {
 
 
 #text-adventure {
-    height:35vh;
+    height:40vh;
     display:flex;
     flex-direction:column;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items:center;
     padding:40px 15%;
     background-color:rgba(0,0,0,.8);
     border-radius:20px 20px;
     margin: 0 20px 20px
+}
+
+#current-text {
+    overflow:auto;
+    list-style-type: none;
+    padding:0;
+    margin:0;
+}
+
+#current-text li {
+    margin: 10px 0;
 }
 
 #current-options {
