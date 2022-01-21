@@ -4,6 +4,10 @@
 
 body {
     margin:0;
+}
+
+main {
+    margin:0;
     display:flex;
     color:#ffffff;
     font-size:1.3em;
