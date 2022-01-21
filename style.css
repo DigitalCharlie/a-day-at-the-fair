@@ -1,0 +1,66 @@
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+body {
+    margin:0;
+    display:flex;
+    color:#ffffff;
+    font-size:1.2em;
+    font-family: fantasy;
+}
+
+/* #top-image {
+    background: black url(img/town-day.jpg) no-repeat fixed;
+    background-size:100%;
+    background-position:bottom;
+    width:100vw;
+    height:70vh;
+}
+
+#text-adventure {
+    background-color:#111111;
+    width:100vw;
+    height:30vh;
+    display:flex;
+    justify-content: center;
+} */
+
+body {
+    background: black url(img/town-day.jpg) no-repeat fixed;
+    background-size:100%;
+    background-position:bottom;
+    width:100vw;
+    height:100vh;
+    flex-direction: column-reverse;
+}
+
+
+#text-adventure {
+    height:35vh;
+    display:flex;
+    flex-direction:column;
+    justify-content: space-around;
+    align-items:center;
+    padding:40px 15%;
+    background-color:rgba(0,0,0,.85);
+    border-radius:20px 20px;
+    margin: 0 20px 20px
+}
+
+#text-adventure article {
+    max-width: 70%;
+}
+
+#current-options {
+    display:flex;
+    justify-content:center;
+}
+
+button {
+    margin: 0 5px;
+    cursor:pointer;
+    font-family: fantasy;
+    font-size:.8em;
+    padding:10px 15px 5px;
+}
