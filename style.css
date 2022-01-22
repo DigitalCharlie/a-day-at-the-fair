@@ -130,6 +130,11 @@ button:hover {
     color:#fff;
 }
 
+.hidden-option {
+    transition-duration: 1s;
+    transition-delay: 2s;
+}
+
 #history {
     position:absolute;
     top:20px;
