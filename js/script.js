@@ -48,10 +48,11 @@ const addToCurrentText = (text) => {
     currentText.appendChild(newText)
 }
 
-const continueButton = (destination) => {
+const continueButton = (eventName) => {
+    clearButtons()
     const newBtn = document.createElement('button')
     newBtn.textContent = "Continue"
-    newBtn.addEventListener('click', destination)
+    newBtn.addEventListener('click', ()=>{newEvent(eventName)})
     optionsBox.appendChild(newBtn)
 }
 
@@ -103,7 +104,7 @@ const toBed = () => {
 
 const toFair = () => {
     addToCurrentText("You hurry to put on your boots and rush out of the inn, not wanting to waste a single moment of the day.")
-    newEvent(outsideTheInn)
+    continueButton(outsideTheInn)
 }
 
 const observeFromWindow = () => {
