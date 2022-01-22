@@ -5,14 +5,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A Day at the Fair</title>
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Calligraffitti&family=Kaushan+Script&family=MedievalSharp&family=Shadows+Into+Light&display=swap" rel="stylesheet"> -->
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
     <link href="style.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
-    <main> <!-- This is separate so I can fade in the background and adjust it more easily on mobile -->
+    <main> <!-- This is separate so I can fade in the background and adjust it more easily on mobile... if I ever mess around with it on mobile -->
         <section id="text-adventure">
             <div id="intro">
                 <h1>Welcome to the Pudding Faire!</h1>
-                <p>Eat, drink and be merry — for there's no other day quite like this one... Right?</p>
+                <p>Eat, drink and be merry — for there's no other day quite like this one... right?</p>
 
                 <p>What is thy name, adventurer?</p><input type="text" id="adventurer-name"><button id="intro-button">Submit</button>
                 <hr>
@@ -20,12 +22,13 @@
             </div>
             <ul id="current-text" hidden><li>The crow of a rooster awakens you from slumber, followed by the sound of a brass band cranking up. "Roll up! Roll up for the Pudding Faire!” cries a voice from the street below. Peering out the inn’s window, you see a crowd of happy halflings and gnomes bustling toward a fairground on the village green. It is seven o’clock in he morning on the day of the annual Honeypuddle Pudding Faire!</li></ul>
             <div id="current-options" style="display:none;">
-                <button>Go back to bed</button>
-                <button>Dash off to the fair</button>
-                <button>Observe for a few minutes</button>
-                <button>Try to remember your dreams</button>
+                <button id="back-to-bed" class="button-option">Go back to bed</button>
+                <button id="dash-to-fair" class="button-option">Dash off to the fair</button>
+                <button id="observe-from-window" class="button-option">Observe for a few minutes</button>
+                <button id="remember-dreams" class="button-option">Try to remember your dreams</button>
             </div>
         </section>
+        <button id="history">Full history</button>
     </main>
 
     <script src="js/script.js"></script>
