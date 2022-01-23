@@ -13,7 +13,7 @@ const history = document.getElementById('history')
 
 // VARIABLES THAT STRUCTURE THE GAME PLAY
 
-let dayCount = 0
+let dayCount = 2
 let goodDeeds = 0
 let badDeeds = 0
 
@@ -69,11 +69,11 @@ const createOptionButtons = (eventName) => {
         for (let i = eventName.options.length-eventName.hiddenOptionCount; i < eventName.options.length; i++) {
             const newBtn = document.createElement('button')
             newBtn.style.opacity = 0
-            newBtn.classList.add('hidden-option')
+            newBtn.classList.add("hidden-option")
             newBtn.textContent = eventName.options[i].button
             newBtn.addEventListener('click', ()=>{addToCurrentText(eventName.options[i].text)})
             optionsBox.appendChild(newBtn)
-            setTimeout(()=> {newBtn.style.opacity = 1},50)
+            setTimeout(()=> {newBtn.style.opacity = 1},1500)
         }
     }
 }

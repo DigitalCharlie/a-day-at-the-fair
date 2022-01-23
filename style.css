@@ -120,6 +120,10 @@ button {
     transition:.25s;
 }
 
+.hidden-option {
+    transition: opacity 1.5s, background-color .25s;
+}
+
 input, button {
     border: 1px solid black;
     border-radius:3px;
@@ -128,11 +132,6 @@ input, button {
 button:hover {
     background-color:blueviolet;
     color:#fff;
-}
-
-.hidden-option {
-    transition-duration: 1s;
-    transition-delay: 2s;
 }
 
 #history {
