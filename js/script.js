@@ -72,6 +72,7 @@ const createOptionButtons = (eventName) => {
             newBtn.classList.add("hidden-option")
             newBtn.textContent = eventName.options[i].button
             newBtn.addEventListener('click', ()=>{addToCurrentText(eventName.options[i].text)})
+            newBtn.addEventListener('click', ()=>{continueButton(eventName.options[i].continue)})
             optionsBox.appendChild(newBtn)
             setTimeout(()=> {newBtn.style.opacity = 1},1500)
         }
@@ -128,21 +129,22 @@ rememberDreamsBtn.addEventListener('click', rememberDreams)
 
 
 // EVENT STRUCTURE
+// i need to hoist all of these to the top since they reference each other? so that means using var?
 
-const beginNewDay = {
+var beginNewDay = { 
     intro: `The crow of a rooster awakens you from slumber, followed by the sound of a brass band cranking up. "Roll up! Roll up for the Pudding Faire!” cries a voice from the street below. Peering out the inn’s window, you see a crowd of happy halflings and gnomes bustling toward a fairground on the village green. It is seven o’clock in he morning on the day of the annual Honeypuddle Pudding Faire!`,
     hiddenOptionCount: 1,
     hiddenCondition: dayCount === 2,
     options: [
-        {button: "Go back to bed", text: "Your head swirls and you decide that this is just too much right now. Perhaps later in the day, after a bit more sleep and a hearty meal from downstairs, the whole situation will feel a bit more manageable."}, 
-        {button: "Dash off to the fair", text: "You hurry to put on your boots and rush out of the inn, not wanting to waste a single moment of the day."},
-        {button: "Observe for a few minutes", text: "You gaze out the window and take in the sight of the fair. You see gnomes performing a maypole dance, a halfling tightrope walking above a crowd of spectators, a few dancers juggling knives, and a dozen games of skill and chance."},
-        {button: "Try to remember your dreams", text: "Before getting out of bed, you close your eyes and try to focus on your dreams from the night before — in your mind's eye, you see a white mole with claws of steel laughing in front of  woman turned to stone. It's a bizarre and haunting image."},
-        {button: "Feel a sense of déjà vu ", text: "Pulling yourself into consciousness, you listen to the sounds outside your window for a moment and swear that what you're hearing is almost identical to what you heard yesterday."}    
+        {button: "Go back to bed", text: "Your head swirls and you decide that this is just too much right now. Perhaps later in the day, after a bit more sleep and a hearty meal from downstairs, the whole situation will feel a bit more manageable.", continue: outsideTheInn}, 
+        {button: "Dash off to the fair", text: "You hurry to put on your boots and rush out of the inn, not wanting to waste a single moment of the day.", continue: outsideTheInn},
+        {button: "Observe for a few minutes", text: "You gaze out the window and take in the sight of the fair. You see gnomes performing a maypole dance, a halfling tightrope walking above a crowd of spectators, a few dancers juggling knives, and a dozen games of skill and chance.", continue: outsideTheInn},
+        {button: "Try to remember your dreams", text: "Before getting out of bed, you close your eyes and try to focus on your dreams from the night before — in your mind's eye, you see a white mole with claws of steel laughing in front of  woman turned to stone. It's a bizarre and haunting image.", continue: outsideTheInn},
+        {button: "Explore that sense of déjà vu ", text: "Pulling yourself into consciousness, you listen to the sounds outside your window for a moment and swear that what you're hearing is almost identical to what you heard yesterday.", continue: outsideTheInn}    
     ]
 }
 
-const outsideTheInn = {
+var outsideTheInn = {
     intro: "This is a test of the event system placed inside of objects. Hopefully it is working properly",
     hiddenOptionCount: 2,
     hiddenCondition: dayCount >= 2,
