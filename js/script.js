@@ -9,7 +9,11 @@ const nameInput = document.getElementById('adventurer-name')
 const textBox = document.getElementById('text-adventure')
 const currentText = document.getElementById('current-text')
 const optionsBox = document.getElementById('current-options')
-const history = document.getElementById('history')
+
+const historyButton = document.getElementById('history-button')
+const historyModal = document.getElementById('history-modal')
+const historyContents = document.getElementById('history-contents')
+const closeHistoryButton = document.getElementById('close-history')
 
 // VARIABLES THAT STRUCTURE THE GAME PLAY
 
@@ -35,10 +39,18 @@ const nameAdventurer = () => {
     introText.hidden = true
     currentText.hidden = false
     optionsBox.style.display = "block"
-    history.style.opacity = 1
-    dayCount++
+    historyButton.style.opacity = 1
+    newEvent(beginNewDay)
     introText.remove()
 }
+
+nameAdvBtn.addEventListener('click', nameAdventurer)
+nameInput.addEventListener('keypress', (e) => {
+    if (e.key == "Enter") {
+        nameAdvBtn.click();
+    }
+})
+
 
 // HOW TO ADD TEXT TO TEXT ADVENTURE SECTION
 
@@ -53,15 +65,23 @@ const clearText = () => { // clears the story text by emptying the innerHTML of 
 const addToCurrentText = (text) => {
     let newText = document.createElement('li') // create a new list item
     newText.textContent = text // make the text of the new list item equal to whatever the input text is
+    let newHistoryText = document.createElement('li')
+    newHistoryText.textContent = text
     currentText.appendChild(newText) // adds it to the UL that holds text
+    historyContents.lastElementChild.appendChild(newHistoryText) // adds it to the history as well
 }
 
 const continueButton = (eventName) => {
     clearButtons() // gets rid of all the current buttons
     const newBtn = document.createElement('button') // creates a new button
     newBtn.textContent = "Continue" // makes it so the text of the new button is continue 
+    console.log(eventName)
     newBtn.addEventListener('click', ()=>{newEvent(eventName)}) // give the new button an event listener to start a new event
     optionsBox.appendChild(newBtn) // add it to the optionsBox
+}
+
+const removeSelectedButton = (button) => {
+    button.remove()
 }
 
 const createOptionButtons = (eventName) => {
@@ -69,7 +89,11 @@ const createOptionButtons = (eventName) => {
         const newBtn = document.createElement('button') // create a button
         newBtn.textContent = eventName.options[i].button // make the name of the button
         newBtn.addEventListener('click', ()=>{addToCurrentText(eventName.options[i].text)}) // makes it so clicking the button adds text to the li
-        newBtn.addEventListener('click', ()=>{continueButton(eventOptions[eventName.options[i].continue])}) // makes it so clicking the button adds an appropriate continue button
+        if (eventOptions[eventName.options[i].continue]) { // checks if there is a continue location — if yes, display it.
+            newBtn.addEventListener('click', ()=>{continueButton(eventOptions[eventName.options[i].continue])})  // makes it so clicking the button adds an appropriate continue button
+        } else {
+            newBtn.addEventListener('click', ()=>{removeSelectedButton(newBtn)}) // if no continue condition, then just remove the selected option after adding the text.
+        }
         optionsBox.appendChild(newBtn) // adds a new button
     }
     if (eventName.hiddenCondition) { // determines if the hidden condition is true
@@ -79,7 +103,11 @@ const createOptionButtons = (eventName) => {
             newBtn.classList.add("hidden-option") // give it a class that gives it transition styles
             newBtn.textContent = eventName.options[i].button
             newBtn.addEventListener('click', ()=>{addToCurrentText(eventName.options[i].text)})
-            newBtn.addEventListener('click', ()=>{continueButton(eventOptions[eventName.options[i].continue])})
+            if (eventOptions[eventName.options[i].continue]) {
+                newBtn.addEventListener('click', ()=>{continueButton(eventOptions[eventName.options[i].continue])})  // makes it so clicking the button adds an appropriate continue button
+            } else {
+                newBtn.addEventListener('click', ()=>{removeSelectedButton(newBtn)})
+            }
             optionsBox.appendChild(newBtn)
             setTimeout(()=> {newBtn.style.opacity = 1},1500) // after 1.5s, then set the opacity of the hidden buttons to 1.
         }
@@ -90,43 +118,49 @@ const createOptionButtons = (eventName) => {
 const newEvent = (eventName) => {
     clearButtons() // clear all buttons
     clearText() // clear all text
+    if (eventName === beginNewDay) {
+        dayCount++
+        newHistoryDay()
+    }
     addToCurrentText(eventName.intro) // put the intro text in the box for the event
     createOptionButtons(eventName) // create the option buttons for the event
 }
 
-// INITIAL STRUCTURE FOR ROUND ONE
-// This will likely be rebuilt using the beginNewDay object.
+// HISTORY MODAL STUFF
 
-const toBedBtn = document.getElementById("back-to-bed")
-const toFairBtn = document.getElementById("dash-to-fair")
-const observeFromWindowBtn = document.getElementById("observe-from-window")
-const rememberDreamsBtn = document.getElementById("remember-dreams")
-
-const toBed = () => {
-    addToCurrentText("Your head swirls and you decide that this is just too much right now. Perhaps later in the day, after a bit more sleep and a hearty meal from downstairs, the whole situation will feel a bit more manageable.")
-    clearButtons()
-    continueButton(clearText)
+const showHistory = () => {
+    historyModal.classList.add('show')
 }
 
-const toFair = () => {
-    addToCurrentText("You hurry to put on your boots and rush out of the inn, not wanting to waste a single moment of the day.")
-    continueButton(outsideTheInn)
+const hideHistory = () => {
+    historyModal.classList.remove('show')
 }
 
-const observeFromWindow = () => {
-    addToCurrentText("You gaze out the window and take in the sight of the fair. You see gnomes performing a maypole dance, a halfling tightrope walking above a crowd of spectators, a few dancers juggling knives, and a dozen games of skill and chance.")
-    clearButtons()
+const modalClick = (evt) => {
+    if (!historyContents.contains(evt.target)) {
+        hideHistory()
+    }
 }
 
-const rememberDreams = () => {
-    addToCurrentText("Before getting out of bed, you close your eyes and try to focus on your dreams from the night before — in your mind's eye, you see a white mole with claws of steel laughing in front of  woman turned to stone. It's a bizarre and haunting image.")
-    clearButtons()
+const newHistoryDay = () => {
+    if (dayCount === 2) {
+        let historyHeadline = historyContents.querySelector('h1')
+        historyHeadline.textContent = "Day 1"
+    }
+    if (dayCount >= 2) {
+        let newHeadline = document.createElement('h1')
+        let newHistoryList = document.createElement('ul')
+        newHistoryList.classList.add('history-list')
+        newHeadline.textContent = 'Day ' + dayCount
+        historyContents.appendChild(newHeadline)
+        historyContents.appendChild(document.createElement('hr'))
+        historyContents.appendChild(newHistoryList)
+    }
 }
 
-toBedBtn.addEventListener('click', toBed)
-toFairBtn.addEventListener('click', toFair)
-observeFromWindowBtn.addEventListener('click', observeFromWindow)
-rememberDreamsBtn.addEventListener('click', rememberDreams)
+historyButton.addEventListener('click', showHistory)
+closeHistoryButton.addEventListener('click', hideHistory)
+historyModal.addEventListener('click', modalClick)
 
 
 // EVENT DATABASE
@@ -138,9 +172,9 @@ const beginNewDay = {
     hiddenOptionCount: 1,
     hiddenCondition: dayCount === 2,
     options: [
-        {button: "Go back to bed", text: "Your head swirls and you decide that this is just too much right now. Perhaps later in the day, after a bit more sleep and a hearty meal from downstairs, the whole situation will feel a bit more manageable.", continue: 1}, 
+        {button: "Go back to bed", text: "Your head swirls and you decide that this is just too much right now. Perhaps later in the day, after a bit more sleep and a hearty meal from downstairs, the whole situation will feel a bit more manageable."}, 
         {button: "Dash off to the fair", text: "You hurry to put on your boots and rush out of the inn, not wanting to waste a single moment of the day.", continue: 1},
-        {button: "Observe for a few minutes", text: "You gaze out the window and take in the sight of the fair. You see gnomes performing a maypole dance, a halfling tightrope walking above a crowd of spectators, a few dancers juggling knives, and a dozen games of skill and chance.", continue: 1},
+        {button: "Observe for a few minutes", text: "You gaze out the window and take in the sight of the fair. You see gnomes performing a maypole dance, a halfling tightrope walking above a crowd of spectators, a few dancers juggling knives, and a dozen games of skill and chance."},
         {button: "Try to remember your dreams", text: "Before getting out of bed, you close your eyes and try to focus on your dreams from the night before — in your mind's eye, you see a white mole with claws of steel laughing in front of  woman turned to stone. It's a bizarre and haunting image.", continue: 1},
         {button: "Explore that sense of déjà vu ", text: "Pulling yourself into consciousness, you listen to the sounds outside your window for a moment and swear that what you're hearing is almost identical to what you heard yesterday.", continue: 1}    
     ]
@@ -166,12 +200,9 @@ const eventOptions = { // I'm setting this up to be called with bracket notation
 
 // EVENT LISTENERS
 
-nameAdvBtn.addEventListener('click', nameAdventurer)
-nameInput.addEventListener('keypress', (e) => {
-    if (e.key == "Enter") {
-        nameAdvBtn.click();
-    }
-})
+
+
+
 
 /* 
 MAIN GAME
@@ -189,4 +220,14 @@ STRETCH
 Randomize of the color of buttons on hover
 Settings, including toggling the opacity of the text section BG
 Close up of characters --> when talking to people?
+
+
+Possible pitfalls:
+- not currently set up to loop statements back on themselves - they always go continue then new event.
+    - maybe need to add clear lines to options
+    - also create a function that is "return to" or something that doesn't re-add intro text but DOES add buttons back.... without the previous option.
+- might want to stage the hidden conditions and run them through a loop rather than assume they're all there.
+- will have some slightly redundant events that will serve as continuations — need to do something for after they select a few options how buttons may change.
+    - ex: can they pick all the options in the room before having to continue? Or after a couple does it force forwards (if possible)?
+- assign time increments to buttons
 */
