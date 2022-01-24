@@ -42,59 +42,60 @@ const nameAdventurer = () => {
 
 // HOW TO ADD TEXT TO TEXT ADVENTURE SECTION
 
+const clearButtons = () => { // clears the buttons by emptying the innerHTML of optionsBox
+    optionsBox.innerHTML = ''
+}
+
+const clearText = () => { // clears the story text by emptying the innerHTML of currentText
+    currentText.innerHTML = ''
+}
+
 const addToCurrentText = (text) => {
-    let newText = document.createElement('li')
-    newText.textContent = text
-    currentText.appendChild(newText)
+    let newText = document.createElement('li') // create a new list item
+    newText.textContent = text // make the text of the new list item equal to whatever the input text is
+    currentText.appendChild(newText) // adds it to the UL that holds text
 }
 
 const continueButton = (eventName) => {
-    clearButtons()
-    const newBtn = document.createElement('button')
-    newBtn.textContent = "Continue"
-    console.log(eventName)
-    newBtn.addEventListener('click', ()=>{newEvent(eventName)})
-    optionsBox.appendChild(newBtn)
+    clearButtons() // gets rid of all the current buttons
+    const newBtn = document.createElement('button') // creates a new button
+    newBtn.textContent = "Continue" // makes it so the text of the new button is continue 
+    newBtn.addEventListener('click', ()=>{newEvent(eventName)}) // give the new button an event listener to start a new event
+    optionsBox.appendChild(newBtn) // add it to the optionsBox
 }
 
 const createOptionButtons = (eventName) => {
-    for (let i = 0; i < eventName.options.length-eventName.hiddenOptionCount; i++) {
-        const newBtn = document.createElement('button')
-        newBtn.textContent = eventName.options[i].button
-        newBtn.addEventListener('click', ()=>{addToCurrentText(eventName.options[i].text)})
-        newBtn.addEventListener('click', ()=>{continueButton(eventOptions[eventName.options[i].continue])})
-        optionsBox.appendChild(newBtn)
+    for (let i = 0; i < eventName.options.length-eventName.hiddenOptionCount; i++) { // for all the non-hidden options
+        const newBtn = document.createElement('button') // create a button
+        newBtn.textContent = eventName.options[i].button // make the name of the button
+        newBtn.addEventListener('click', ()=>{addToCurrentText(eventName.options[i].text)}) // makes it so clicking the button adds text to the li
+        newBtn.addEventListener('click', ()=>{continueButton(eventOptions[eventName.options[i].continue])}) // makes it so clicking the button adds an appropriate continue button
+        optionsBox.appendChild(newBtn) // adds a new button
     }
-    if (eventName.hiddenCondition) {
-        for (let i = eventName.options.length-eventName.hiddenOptionCount; i < eventName.options.length; i++) {
+    if (eventName.hiddenCondition) { // determines if the hidden condition is true
+        for (let i = eventName.options.length-eventName.hiddenOptionCount; i < eventName.options.length; i++) { // for the hidden buttons
             const newBtn = document.createElement('button')
-            newBtn.style.opacity = 0
-            newBtn.classList.add("hidden-option")
+            newBtn.style.opacity = 0 // don't initially show it
+            newBtn.classList.add("hidden-option") // give it a class that gives it transition styles
             newBtn.textContent = eventName.options[i].button
             newBtn.addEventListener('click', ()=>{addToCurrentText(eventName.options[i].text)})
             newBtn.addEventListener('click', ()=>{continueButton(eventOptions[eventName.options[i].continue])})
             optionsBox.appendChild(newBtn)
-            setTimeout(()=> {newBtn.style.opacity = 1},1500)
+            setTimeout(()=> {newBtn.style.opacity = 1},1500) // after 1.5s, then set the opacity of the hidden buttons to 1.
         }
     }
 }
 
-const clearButtons = () => {
-    optionsBox.innerHTML = ''
-}
-
-const clearText = () => {
-    currentText.innerHTML = ''
-}
 
 const newEvent = (eventName) => {
-    clearButtons()
-    clearText()
-    addToCurrentText(eventName.intro)
-    createOptionButtons(eventName)
+    clearButtons() // clear all buttons
+    clearText() // clear all text
+    addToCurrentText(eventName.intro) // put the intro text in the box for the event
+    createOptionButtons(eventName) // create the option buttons for the event
 }
 
 // INITIAL STRUCTURE FOR ROUND ONE
+// This will likely be rebuilt using the beginNewDay object.
 
 const toBedBtn = document.getElementById("back-to-bed")
 const toFairBtn = document.getElementById("dash-to-fair")
@@ -128,8 +129,9 @@ observeFromWindowBtn.addEventListener('click', observeFromWindow)
 rememberDreamsBtn.addEventListener('click', rememberDreams)
 
 
-// EVENT STRUCTURE
-// i need to hoist all of these to the top since they reference each other? so that means using var?
+// EVENT DATABASE
+// Each has intro text, which displays, a hidden option condition, and then a count of hidden option — which are always the last number of options.
+// the continue number is associated with the eventOptions object and is used when calling new continue buttons
 
 const beginNewDay = { 
     intro: `The crow of a rooster awakens you from slumber, followed by the sound of a brass band cranking up. "Roll up! Roll up for the Pudding Faire!” cries a voice from the street below. Peering out the inn’s window, you see a crowd of happy halflings and gnomes bustling toward a fairground on the village green. It is seven o’clock in he morning on the day of the annual Honeypuddle Pudding Faire!`,
