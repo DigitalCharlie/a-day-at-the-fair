@@ -29,6 +29,7 @@ main {
     width:100vw;
     height:100vh;
     flex-direction: column-reverse;
+    overflow: hidden;
 }
 
 main, button {
@@ -141,6 +142,7 @@ button:hover {
     opacity:0;
 }
 
+/* This modal code is partially borrowed from https://codepen.io/eddyerburgh/pen/YqvVrr - along with the javascript. Used primarily as a reference, and wound up with... a very similar outcome. */
 #history-modal {
     width: 100%;
     height: 100%;

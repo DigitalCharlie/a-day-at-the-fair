@@ -21,7 +21,7 @@ let dayCount = 0
 let goodDeeds = 0
 let badDeeds = 0
 
-// FADE IN THE SCREEN IN STAGES
+// FADE IN THE SCREEN IN STAGES ... AND MAKE BUTTON COLORS RANDOM
 
 body.classList.add('fade-in')
 textBox.classList.add('fade-in')
@@ -75,9 +75,9 @@ const continueButton = (eventName) => {
     clearButtons() // gets rid of all the current buttons
     const newBtn = document.createElement('button') // creates a new button
     newBtn.textContent = "Continue" // makes it so the text of the new button is continue 
-    console.log(eventName)
     newBtn.addEventListener('click', ()=>{newEvent(eventName)}) // give the new button an event listener to start a new event
     optionsBox.appendChild(newBtn) // add it to the optionsBox
+    buttonColorIsRandom()
 }
 
 const removeSelectedButton = (button) => {
@@ -96,7 +96,8 @@ const createOptionButtons = (eventName) => {
         }
         optionsBox.appendChild(newBtn) // adds a new button
     }
-    if (eventName.hiddenCondition) { // determines if the hidden condition is true
+    resetHiddenConditions()
+    if (eventName.hiddenCondition) { // determines if the hidden condition is true 
         for (let i = eventName.options.length-eventName.hiddenOptionCount; i < eventName.options.length; i++) { // for the hidden buttons
             const newBtn = document.createElement('button')
             newBtn.style.opacity = 0 // don't initially show it
@@ -124,6 +125,7 @@ const newEvent = (eventName) => {
     }
     addToCurrentText(eventName.intro) // put the intro text in the box for the event
     createOptionButtons(eventName) // create the option buttons for the event
+    buttonColorIsRandom()
 }
 
 // HISTORY MODAL STUFF
@@ -162,6 +164,28 @@ historyButton.addEventListener('click', showHistory)
 closeHistoryButton.addEventListener('click', hideHistory)
 historyModal.addEventListener('click', modalClick)
 
+// BUTTON COLOR IS RANDOM!
+
+const buttonColorIsRandom = () => {
+    const buttons = document.querySelectorAll('button')
+    const btnHoverClass = document.querySelector('.randomColor')
+    
+    const randomColor = () => {
+      let color = Math.floor(Math.random()*16777215).toString(16);
+      event.target.style.backgroundColor = '#' + color
+    }
+    
+    const returnColor = () => {
+      event.target.style.backgroundColor = 'rgb(239, 239, 239)'
+    }
+    
+    for (btn of buttons) {
+      btn.addEventListener('mouseover', randomColor)
+    }
+    for (btn of buttons) {
+      btn.addEventListener('mouseout', returnColor)
+    }
+}
 
 // EVENT DATABASE
 // Each has intro text, which displays, a hidden option condition, and then a count of hidden option — which are always the last number of options.
@@ -197,9 +221,14 @@ const eventOptions = { // I'm setting this up to be called with bracket notation
     1: outsideTheInn
 }
 
+const resetHiddenConditions = () => {
+    beginNewDay.hiddenCondition = dayCount === 2
+    outsideTheInn.hiddenCondition = dayCount >= 2
+}
 
-// EVENT LISTENERS
+// STUFF AT THE END
 
+buttonColorIsRandom()
 
 
 
