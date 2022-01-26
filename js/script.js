@@ -347,16 +347,11 @@ Arrays for dialogue for non-looped NPCs
 
 
 STRETCH
-DONE Randomize of the color of buttons on hover
 Settings, including toggling the opacity of the text section BG
 Close up of characters --> when talking to people?
-
 
 Possible pitfalls:
 - will have some slightly redundant events that will serve as continuations — need to do something for after they select a few options how buttons may change.
     - ex: can they pick all the options in the room before having to continue? Or after a couple does it force forwards (if possible)?
-- assign time increments to buttons
-- make the hidden options distinct — so hidden option 1, hidden option 2, and then add "first time displayed" to determine whether it gets the fade in or just happen immediately.
-
 
 */
