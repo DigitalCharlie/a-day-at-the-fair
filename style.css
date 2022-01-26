@@ -9,27 +9,22 @@ body {
 
 .fade-in {
     opacity: 1!important;
-    /* transition-duration: 2.5s;
-    transition-timing-function: ease-in-out; */
+    transition-duration: 1.5s;
+    transition-timing-function: ease-in-out;
 }
 
 #text-adventure {
     opacity:0;
-    /* transition-duration: 2.5s;
-    transition-delay: 3s; */
+    transition-duration: 2.5s;
+    transition-delay: 2s;
 }
 
 main {
-    margin:0;
     display:flex;
     color:#ffffff;
-    /* background: black url(img/town-day.jpg) no-repeat fixed; */
-    background-size:100%;
-    background-position:top;
     width:100vw;
     height:100vh;
     flex-direction: column-reverse;
-    overflow: hidden;
     position:absolute;
 }
 
@@ -42,9 +37,9 @@ main {
 .bg-image {
     width:100vw;
     height: 100vh;
-    transition: opacity 1s ease-in-out;
+    transition: opacity .5s ease-in-out;
     position:fixed;
-    background-size:100%;
+    background-size:cover;
     background-repeat: no-repeat;
     background-position: top;
   }  
@@ -107,7 +102,7 @@ input[type="text"] {
     flex-direction:column;
     justify-content: space-between;
     align-items:center;
-    padding:40px 15% 25px;
+    padding:25px 15% 25px;
     background-color:rgba(0,0,0,.8);
     border-radius:20px 20px;
     margin: 0 20px 20px
