@@ -75,6 +75,7 @@ const addToCurrentText = (text) => {
     currentText.appendChild(newText) // adds it to the UL that holds text
     historyContents.lastElementChild.appendChild(newHistoryText) // adds it to the history as well
     currentText.scrollTop = currentText.scrollHeight
+    textBox.blur()
 }
 
 const continueButton = (eventName) => {
