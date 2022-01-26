@@ -235,6 +235,9 @@ button:hover {
     body {
         font-size:.75em;
     }
+    main {
+        height:80vh;
+    }
     #intro p:nth-of-type(2) {
         display:block;
         margin-bottom:0;
@@ -269,6 +272,7 @@ button:hover {
     button {
         font-size:1em;
         margin: 2px 5px;
+        color:black;
     }
     
 }
