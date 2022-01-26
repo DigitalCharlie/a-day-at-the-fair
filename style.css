@@ -221,6 +221,7 @@ button:hover {
     }
     #text-adventure {
         height:50vh;
+        height: calc(var(--vh, 1vh) * 50);
     }
     #current-options {
         display:block;
@@ -255,6 +256,7 @@ button:hover {
     #text-adventure {
         width:100vw;
         height:70vh;
+        height: calc(var(--vh, 1vh) * 70);
         margin:0;
         background:black;
         border-radius: 0;
