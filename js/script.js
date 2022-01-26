@@ -326,10 +326,14 @@ const resetDailyConditions = () => {
 }
 
 
+// SET THE VH BASED ON WINDOW SIZE BECAUSE MOBILE VH IS ANNOYING.
+// This is the method used on this page — it's grabbing the innerheight of the window rather than the whole thing, which should solve how safari on iOS counts the URL bar and such as part of the vh.
+let vh = window.innerHeight * 0.01;
+document.documentElement.style.setProperty('--vh', `${vh}px`);
+
 // STUFF AT THE END
 
 buttonColorIsRandom()
-
 
 
 

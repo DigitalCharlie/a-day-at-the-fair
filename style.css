@@ -25,6 +25,7 @@ main {
     color:#ffffff;
     width:100vw;
     height:100vh;
+    height: calc(var(--vh, 1vh) * 100);
     flex-direction: column-reverse;
     position:absolute;
     overflow:auto;
@@ -32,6 +33,7 @@ main {
 
 #bg {
     height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
     width: 100vw;
     position: fixed;
   }
@@ -234,9 +236,6 @@ button:hover {
 @media (max-width:650px) {
     body {
         font-size:.75em;
-    }
-    main {
-        height:80vh;
     }
     #intro p:nth-of-type(2) {
         display:block;
