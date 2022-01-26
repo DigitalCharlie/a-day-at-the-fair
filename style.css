@@ -5,18 +5,19 @@
 body {
     margin:0;
     opacity:0;
+    background-color: black;
 }
 
 .fade-in {
     opacity: 1!important;
-    transition-duration: 1.5s;
-    transition-timing-function: ease-in-out;
+    /* transition-duration: 1.5s;
+    transition-timing-function: ease-in-out; */
 }
 
 #text-adventure {
-    opacity:0;
+    /* opacity:0;
     transition-duration: 2.5s;
-    transition-delay: 2s;
+    transition-delay: 2s; */
 }
 
 main {
@@ -26,6 +27,7 @@ main {
     height:100vh;
     flex-direction: column-reverse;
     position:absolute;
+    overflow:auto;
 }
 
 #bg {
@@ -45,7 +47,7 @@ main {
   }  
 
 main, button {
-    font-size:1.3em;
+    font-size:1.2em;
     /* font-family: 'Kaushan Script', cursive;
     font-family: 'Shadows Into Light', cursive;
     font-family: 'Calligraffitti', cursive; */
@@ -98,15 +100,18 @@ input[type="text"] {
 
 
 #text-adventure {
-    height:40vh;
+    height:42vh;
     display:flex;
     flex-direction:column;
-    justify-content: space-between;
+    justify-content: center;
     align-items:center;
     padding:25px 15% 25px;
     background-color:rgba(0,0,0,.8);
     border-radius:20px 20px;
-    margin: 0 20px 20px
+    margin: 0 20px 20px;
+}
+#text-adventure.text-adventure-justify {
+    justify-content:space-between;
 }
 
 #current-text {
@@ -126,7 +131,7 @@ input[type="text"] {
 }
 
 button {
-    margin: 2px 5px;
+    margin: 5px;
     cursor:pointer;
     font-size:.8em;
     padding:10px 15px 5px;
@@ -208,10 +213,27 @@ button:hover {
     color:#fff;
 }
 
-@media (max-width:600px) {
+@media (max-width:1200px){
     body {
-        font-size:.65em;
-        background-color: black;;
+        font-size:.9em;
+    }
+    #text-adventure {
+        height:50vh;
+    }
+    #current-options {
+        display:block;
+    }
+}
+
+@media (max-width:880px){
+    body {
+        font-size:.8em;
+    }
+}
+
+@media (max-width:650px) {
+    body {
+        font-size:.75em;
     }
     #intro p:nth-of-type(2) {
         display:block;
@@ -235,6 +257,8 @@ button:hover {
         background:black;
         border-radius: 0;
         padding:1vh 5vw;
+    }
+    #text-adventure.text-adventure-justify {
         justify-content:space-around;
     }
     #current-options {
@@ -244,6 +268,12 @@ button:hover {
     }
     button {
         font-size:1em;
+        margin: 2px 5px;
     }
     
 }
+
+@media (max-width:500px) {
+    body {
+        font-size:.65em;
+    }

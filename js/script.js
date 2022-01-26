@@ -39,9 +39,9 @@ const nameAdventurer = () => {
         adventurer = "Traveler" // default if it is blank — this will get used as easter egg dialogue later
     }
     console.log('Adventurer is now named ' + adventurer)
+    textBox.classList.add('text-adventure-justify')
     introText.hidden = true
     currentText.hidden = false
-    optionsBox.style.display = "flex"
     historyButton.style.opacity = 1
     newEvent(beginNewDay)
     introText.remove()
