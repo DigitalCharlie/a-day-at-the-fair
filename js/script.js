@@ -71,8 +71,7 @@ const removeSelectedButton = (button) => {
 const addToCurrentText = (text) => {
     let newText = document.createElement('li') // create a new list item
     newText.textContent = text // make the text of the new list item equal to whatever the input text is
-    let newHistoryText = document.createElement('li')
-    newHistoryText.textContent = text
+    let newHistoryText = newText.cloneNode(true)
     currentText.appendChild(newText) // adds it to the UL that holds text
     historyContents.lastElementChild.appendChild(newHistoryText) // adds it to the history as well
     currentText.scrollTop = currentText.scrollHeight
