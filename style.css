@@ -23,14 +23,31 @@ main {
     margin:0;
     display:flex;
     color:#ffffff;
-    background: black url(img/town-day.jpg) no-repeat fixed;
+    /* background: black url(img/town-day.jpg) no-repeat fixed; */
     background-size:100%;
     background-position:top;
     width:100vw;
     height:100vh;
     flex-direction: column-reverse;
     overflow: hidden;
+    position:absolute;
 }
+
+#bg {
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+  }
+
+.bg-image {
+    width:100vw;
+    height: 100vh;
+    transition: opacity 1s ease-in-out;
+    position:fixed;
+    background-size:100%;
+    background-repeat: no-repeat;
+    background-position: top;
+  }  
 
 main, button {
     font-size:1.3em;
@@ -90,7 +107,7 @@ input[type="text"] {
     flex-direction:column;
     justify-content: space-between;
     align-items:center;
-    padding:40px 15%;
+    padding:40px 15% 25px;
     background-color:rgba(0,0,0,.8);
     border-radius:20px 20px;
     margin: 0 20px 20px

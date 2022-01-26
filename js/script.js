@@ -15,6 +15,8 @@ const historyModal = document.getElementById('history-modal')
 const historyContents = document.getElementById('history-contents')
 const closeHistoryButton = document.getElementById('close-history')
 
+const bg = document.getElementById('bg')
+
 // VARIABLES THAT STRUCTURE THE GAME PLAY
 
 let dayCount = 0
@@ -85,7 +87,7 @@ const removeSelectedButton = (button) => {
 }
 
 const createOptionButtons = (eventName) => {
-    for (let i = 0; i < eventName.options.length-eventName.hiddenOptionCount; i++) { // for all the non-hidden options
+    for (let i = 0; i < eventName.options.length; i++) { // for all the non-hidden options
         const newBtn = document.createElement('button') // create a button
         newBtn.textContent = eventName.options[i].button // make the name of the button
         newBtn.addEventListener('click', ()=>{addToCurrentText(eventName.options[i].text)}) // makes it so clicking the button adds text to the li
@@ -94,23 +96,39 @@ const createOptionButtons = (eventName) => {
         } else {
             newBtn.addEventListener('click', ()=>{removeSelectedButton(newBtn)}) // if no continue condition, then just remove the selected option after adding the text.
         }
+        if (eventName.options[i].bg) {
+            newBtn.addEventListener('click', ()=>{newBg(eventName.options[i].bg)}) 
+        }
         optionsBox.appendChild(newBtn) // adds a new button
     }
-    resetHiddenConditions()
-    if (eventName.hiddenCondition) { // determines if the hidden condition is true 
-        for (let i = eventName.options.length-eventName.hiddenOptionCount; i < eventName.options.length; i++) { // for the hidden buttons
-            const newBtn = document.createElement('button')
-            newBtn.style.opacity = 0 // don't initially show it
-            newBtn.classList.add("hidden-option") // give it a class that gives it transition styles
-            newBtn.textContent = eventName.options[i].button
-            newBtn.addEventListener('click', ()=>{addToCurrentText(eventName.options[i].text)})
-            if (eventOptions[eventName.options[i].continue]) {
-                newBtn.addEventListener('click', ()=>{continueButton(eventOptions[eventName.options[i].continue])})  // makes it so clicking the button adds an appropriate continue button
-            } else {
-                newBtn.addEventListener('click', ()=>{removeSelectedButton(newBtn)})
+
+    resetHiddenConditions() // I hate this and don't understand why I need it, but I seem to.
+
+    if (eventName.hiddenOptions) { // determines if there are hidden options
+        for (let i = 0; i < eventName.hiddenOptions.length; i++) { // for the hidden buttons
+            if (eventName.hiddenOptions[i].condition) { // if their hidden conditions are true --> do the stuff above.
+                const newBtn = document.createElement('button')
+                newBtn.style.opacity = 0 // don't initially show it
+                newBtn.classList.add("hidden-option") // give it a class that gives it transition styles
+                newBtn.textContent = eventName.hiddenOptions[i].button
+                newBtn.addEventListener('click', ()=>{addToCurrentText(eventName.hiddenOptions[i].text)})
+                if (eventOptions[eventName.hiddenOptions[i].continue]) {
+                    newBtn.addEventListener('click', ()=>{continueButton(eventOptions[eventName.hiddenOptions[i].continue])})  // makes it so clicking the button adds an appropriate continue button
+                } else {
+                    newBtn.addEventListener('click', ()=>{removeSelectedButton(newBtn)})
+                }
+                if (eventName.hiddenOptions[i].bg) {
+                    newBtn.addEventListener('click', ()=>{newBg(eventName.hiddenOptions[i].bg)}) 
+                }
+                optionsBox.appendChild(newBtn)
+                if (eventName.hiddenOptions[i].alreadyDisplayed === false) {
+                    setTimeout(()=> {newBtn.style.opacity = 1},1000) // after 1.5s, then set the opacity of the hidden buttons to 1.
+                    eventName.hiddenOptions[i].alreadyDisplayed = true
+                } else {
+                    newBtn.style.opacity = 1
+                }
             }
-            optionsBox.appendChild(newBtn)
-            setTimeout(()=> {newBtn.style.opacity = 1},1500) // after 1.5s, then set the opacity of the hidden buttons to 1.
+
         }
     }
 }
@@ -125,8 +143,33 @@ const newEvent = (eventName) => {
     }
     addToCurrentText(eventName.intro) // put the intro text in the box for the event
     createOptionButtons(eventName) // create the option buttons for the event
+    if(eventName.eventBg) {
+        newBg(eventName.eventBg)
+    }
     buttonColorIsRandom()
 }
+
+// BACKGROUND TOGGLES
+
+const newBg = (backgroundImage) => {
+    console.log(backgroundImage)
+    const oldBg = document.querySelector("#bg div:nth-child(1)")
+    const newBg = document.createElement('div')
+    newBg.classList.add('bg-image')
+    newBg.style.backgroundImage = 'url(' + backgroundImage + ')'
+    newBg.style.opacity = 0
+    bg.prepend(newBg)
+    toggleBg()
+  }
+  
+const toggleBg = () => {
+    const topBg = document.querySelector("#bg div:nth-child(2)")
+    const bottomBg = document.querySelector("#bg div:nth-child(1)")
+    topBg.style.opacity = 0
+    bottomBg.style.opacity = 1
+    setTimeout(() => {topBg.remove()}, 1000);
+}
+  
 
 // HISTORY MODAL STUFF
 
@@ -192,27 +235,29 @@ const buttonColorIsRandom = () => {
 // the continue number is associated with the eventOptions object and is used when calling new continue buttons
 
 const beginNewDay = { 
+    eventBg: 'img/town-day.jpg',
     intro: `The crow of a rooster awakens you from slumber, followed by the sound of a brass band cranking up. "Roll up! Roll up for the Pudding Faire!” cries a voice from the street below. Peering out the inn’s window, you see a crowd of happy halflings and gnomes bustling toward a fairground on the village green. It is seven o’clock in he morning on the day of the annual Honeypuddle Pudding Faire!`,
-    hiddenOptionCount: 1,
-    hiddenCondition: dayCount === 2,
     options: [
         {button: "Go back to bed", text: "Your head swirls and you decide that this is just too much right now. Perhaps later in the day, after a bit more sleep and a hearty meal from downstairs, the whole situation will feel a bit more manageable."}, 
-        {button: "Dash off to the fair", text: "You hurry to put on your boots and rush out of the inn, not wanting to waste a single moment of the day.", continue: 1},
-        {button: "Observe for a few minutes", text: "You gaze out the window and take in the sight of the fair. You see gnomes performing a maypole dance, a halfling tightrope walking above a crowd of spectators, a few dancers juggling knives, and a dozen games of skill and chance."},
-        {button: "Try to remember your dreams", text: "Before getting out of bed, you close your eyes and try to focus on your dreams from the night before — in your mind's eye, you see a white mole with claws of steel laughing in front of  woman turned to stone. It's a bizarre and haunting image.", continue: 1},
-        {button: "Explore that sense of déjà vu ", text: "Pulling yourself into consciousness, you listen to the sounds outside your window for a moment and swear that what you're hearing is almost identical to what you heard yesterday.", continue: 1}    
+        {button: "Dash off to the fair", bg: 'img/town-day.jpg', text: "You hurry to put on your boots and rush out of the inn, not wanting to waste a single moment of the day.", continue: 1},
+        {button: "Observe for a few minutes", bg: 'img/the-faire.png', text: "You gaze out the window and take in the sight of the fair. You see gnomes performing a maypole dance, a halfling tightrope walking above a crowd of spectators, a few dancers juggling knives, and a dozen games of skill and chance."},
+        {button: "Try to remember your dreams", bg: 'img/town-day.jpg', text: "Before getting out of bed, you close your eyes and try to focus on your dreams from the night before — in your mind's eye, you see a white mole with claws of steel laughing in front of  woman turned to stone. It's a bizarre and haunting image.", continue: 1},
+    ],
+    hiddenOptions: [
+        {condition: dayCount === 2, alreadyDisplayed: false, button: "Explore that sense of déjà vu ", bg: 'img/town-day.jpg', text: "Pulling yourself into consciousness, you listen to the sounds outside your window for a moment and swear that what you're hearing is almost identical to what you heard yesterday.", continue: 1}    
     ]
 }
 
 const outsideTheInn = {
+    eventBg: 'img/the-faire.png',
     intro: "This is a test of the event system placed inside of objects. Hopefully it is working properly",
-    hiddenOptionCount: 2,
-    hiddenCondition: dayCount >= 2,
     options: [
         {button: "Option 1", text: "You chose option 1", continue: 0}, 
         {button: "Option 2", text: "You chose option 2", continue: 0},
-        {button: "Option 3", text: "You chose option 3 — which should only happen after day 1", continue: 0},
-        {button: "Option 4", text: "You chose option 3 — which should only happen after day 1", continue: 0}
+    ],
+    hiddenOptions: [
+        {condition: dayCount >= 2, alreadyDisplayed: false, button: "Option 3", text: "You chose option 3 — which should only happen after day 1", continue: 0},
+        {condition: dayCount >= 2, alreadyDisplayed: false, button: "Option 4", text: "You chose option 3 — which should only happen after day 1", continue: 0}
     ]
 }
 
@@ -222,8 +267,9 @@ const eventOptions = { // I'm setting this up to be called with bracket notation
 }
 
 const resetHiddenConditions = () => {
-    beginNewDay.hiddenCondition = dayCount === 2
-    outsideTheInn.hiddenCondition = dayCount >= 2
+    beginNewDay.hiddenOptions[0].condition = dayCount === 2
+    outsideTheInn.hiddenOptions[0].condition = dayCount >= 2
+    outsideTheInn.hiddenOptions[1].condition = dayCount >= 2
 }
 
 // STUFF AT THE END
@@ -246,17 +292,21 @@ Arrays for dialogue for non-looped NPCs
 
 
 STRETCH
-Randomize of the color of buttons on hover
+DONE Randomize of the color of buttons on hover
 Settings, including toggling the opacity of the text section BG
 Close up of characters --> when talking to people?
 
 
 Possible pitfalls:
-- not currently set up to loop statements back on themselves - they always go continue then new event.
-    - maybe need to add clear lines to options
-    - also create a function that is "return to" or something that doesn't re-add intro text but DOES add buttons back.... without the previous option.
 - might want to stage the hidden conditions and run them through a loop rather than assume they're all there.
 - will have some slightly redundant events that will serve as continuations — need to do something for after they select a few options how buttons may change.
     - ex: can they pick all the options in the room before having to continue? Or after a couple does it force forwards (if possible)?
 - assign time increments to buttons
+- make the hidden options distinct — so hidden option 1, hidden option 2, and then add "first time displayed" to determine whether it gets the fade in or just happen immediately.
+
+
+if I have multiple hidden conditions, should I instead make the statement be a loop for those hidden conditions and store them inside of their own object in the event object? So then there can be multiple?
+    - similar to options.
+    - if statement is for the event as a whole, if it exists.
+
 */
