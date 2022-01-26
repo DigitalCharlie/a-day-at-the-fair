@@ -41,7 +41,7 @@ const nameAdventurer = () => {
     console.log('Adventurer is now named ' + adventurer)
     introText.hidden = true
     currentText.hidden = false
-    optionsBox.style.display = "block"
+    optionsBox.style.display = "flex"
     historyButton.style.opacity = 1
     newEvent(beginNewDay)
     introText.remove()

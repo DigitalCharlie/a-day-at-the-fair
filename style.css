@@ -93,6 +93,7 @@ input[type="text"] {
 
 .small-text {
     font-size:.7em;
+    margin:5px;
 }
 
 
@@ -210,10 +211,26 @@ button:hover {
 
 @media (max-width:600px) {
     body {
-        font-size:.8em;
+        font-size:.65em;
+        background-color: black;;
+    }
+    #intro p:nth-of-type(2) {
+        display:block;
+        margin-bottom:0;
+    }
+    .small-text {
+        font-size:.85em;
+        margin:10px;
+    }
+    .bg-image {
+        background-size:contain;
+    }
+    #history-button {
+        top: 5px;
+        right: 5px;
     }
     #text-adventure {
-        width:90vw;
+        width:100vw;
         height:70vh;
         margin:0;
         background:black;
@@ -222,7 +239,12 @@ button:hover {
         justify-content:space-around;
     }
     #current-options {
+        display:flex;
         flex-direction: column;
         margin-top:10px;
     }
+    button {
+        font-size:1em;
+    }
+    
 }
