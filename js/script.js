@@ -128,7 +128,7 @@ const incrementDeed = (deed) => {
         badDeeds++
     }
 }
-
+//damnit could this whole thing have been written so it's like... "current event" and then it does all the evaluation when the button is clicked rather than adding event listeners like this? Oof.
 const createOptionButtons = (eventName) => {
     for (let i = 0; i < eventName.options.length; i++) { // for all the non-hidden options
         const newBtn = document.createElement('button') // create a button
