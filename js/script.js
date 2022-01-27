@@ -75,7 +75,6 @@ const addToCurrentText = (text) => {
     currentText.appendChild(newText) // adds it to the UL that holds text
     historyContents.lastElementChild.appendChild(newHistoryText) // adds it to the history as well
     currentText.scrollTop = currentText.scrollHeight
-    textBox.blur()
 }
 
 const continueButton = (eventName) => {
@@ -122,6 +121,14 @@ const newEvent = (eventName) => {
     buttonColorIsRandom()
 }
 
+const incrementDeed = (deed) => {
+    if (deed === 'good') {
+        goodDeeds++
+    } else {
+        badDeeds++
+    }
+}
+
 const createOptionButtons = (eventName) => {
     for (let i = 0; i < eventName.options.length; i++) { // for all the non-hidden options
         const newBtn = document.createElement('button') // create a button
@@ -132,6 +139,9 @@ const createOptionButtons = (eventName) => {
             newBtn.addEventListener('click', ()=>{continueButton(eventOptions[eventName.options[i].continue])})  // makes it so clicking the button adds an appropriate continue button
         } else {
             newBtn.addEventListener('click', ()=>{removeSelectedButton(newBtn)}) // if no continue condition, then just remove the selected option after adding the text.
+        }
+        if (eventName.options[i].deed) {
+            newBtn.addEventListener('click', ()=>{incrementDeed(eventName.options[i].deed)}) 
         }
         if (eventName.options[i].bg) {
             newBtn.addEventListener('click', ()=>{newBg(eventName.options[i].bg)}) 
@@ -169,6 +179,9 @@ const createOptionButtons = (eventName) => {
                 }
                 if (eventName.hiddenOptions[i].permConChanges) {
                     newBtn.addEventListener('click', ()=>{changePermConditions(eventName.hiddenOptions[i].permConChanges)}) 
+                }
+                if (eventName.hiddenOptions[i].deed) {
+                    newBtn.addEventListener('click', ()=>{incrementDeed(eventName.hiddenOptions[i].deed)}) 
                 }
                 optionsBox.appendChild(newBtn)
                 if (eventName.hiddenOptions[i].alreadyDisplayed === false) {
@@ -272,7 +285,7 @@ const beginNewDay = {
     intro: `The crow of a rooster awakens you from slumber, followed by the sound of a brass band cranking up. "Roll up! Roll up for the Pudding Faire!” cries a voice from the street below. Peering out the inn’s window, you see a crowd of happy halflings and gnomes bustling toward a fairground on the village green. It is seven o’clock in he morning on the day of the annual Honeypuddle Pudding Faire!`,
     options: [
         {button: "Go back to bed", duration: 2, text: "Your head swirls and you decide that this is just too much right now. Perhaps later in the day, after a bit more sleep and a hearty meal from downstairs, the whole situation will feel a bit more manageable."}, 
-        {button: "Dash off to the fair", duration: 0, continue: 1, bg: 'img/town-day.jpg', text: "You hurry to put on your boots and rush out of the inn, not wanting to waste a single moment of the day."},
+        {button: "Dash off to the fair", deed: 'good', duration: 0, continue: 1, bg: 'img/town-day.jpg', text: "You hurry to put on your boots and rush out of the inn, not wanting to waste a single moment of the day."},
         {button: "Observe for a few minutes", dailyConChanges: ['Avoided puddle','Played game'], duration: .5, bg: 'img/the-faire.png', text: "You gaze out the window and take in the sight of the fair. You see gnomes performing a maypole dance, a halfling tightrope walking above a crowd of spectators, a few dancers juggling knives, and a dozen games of skill and chance."},
         {button: "Try to remember your dreams", duration: .5, continue: 1, bg: 'img/town-day.jpg', text: "Before getting out of bed, you close your eyes and try to focus on your dreams from the night before — in your mind's eye, you see a white mole with claws of steel laughing in front of  woman turned to stone. It's a bizarre and haunting image."},
     ],
