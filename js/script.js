@@ -83,7 +83,12 @@ const continueButton = (eventName) => {
     clearButtons() // gets rid of all the current buttons
     const newBtn = document.createElement('button') // creates a new button
     newBtn.textContent = "Continue" // makes it so the text of the new button is continue 
-    newBtn.addEventListener('click', ()=>{newEvent(eventName)}) // give the new button an event listener to start a new event
+    if (eventName != (beginNewDay || returnToInnAtNight) && timeOfDay >= 16) {
+        returnToInnBg()
+        newBtn.addEventListener('click', ()=>{newEvent(returnToInnAtNight)})
+    } else {
+        newBtn.addEventListener('click', ()=>{newEvent(eventName)}) // give the new button an event listener to start a new event
+    }
     optionsBox.appendChild(newBtn) // add it to the optionsBox
     buttonColorIsRandom()
 }
@@ -227,7 +232,20 @@ const toggleBg = () => {
     bottomBg.style.opacity = 1
     setTimeout(() => {topBg.remove()}, 500);
 }
-  
+
+// BACKGROUND FOR RETURN TO INN BASED ON LOCATION
+
+const returnToInnBg = () => {
+    if (partOfTown === 'carnival') {
+        returnToInnAtNight.eventBg = 'img/woods-fair-night.jpg'
+    } else if (partOfTown === 'main tent') {
+        returnToInnAtNight.eventBg = 'img/main-tent-night.jpg'
+    } else if (partOfTown === 'shops') {
+        returnToInnAtNight.eventBg = 'img/market-night.png'
+    } else {
+        returnToInnAtNight.eventBg = 'img/town-night.jpg'
+    }
+}
 
 // HISTORY MODAL STUFF
 
@@ -316,7 +334,7 @@ const beginNewDay = {
 		},
 		{
 			button:`Try to remember your dreams`,
-			text:`Before getting out of bed, you close your eyes and try to focus on your dreams from the night before — in your mind's eye, you see a white mole with claws of steel laughing in front of woman turned to stone. It's a bizarre and haunting image.`,
+			text:`You close your eyes and try to focus on your dreams from the night before — in your mind's eye, you see a white mole with claws of steel laughing in front of woman turned to stone. It's a bizarre and haunting image.`,
 			duration:.5,
 			bg:`img/whitemole.png`,
 		},
@@ -369,39 +387,25 @@ const outsideTheInn = {
 			duration:.5,
 			continue:3,
 			//bg:``,
-			//dailyConChanges:[],
-			//permConChanges:[],
-			//deed:``
 		},
 		{
 			button:`Peruse the shops`,
 			text:`You head off towards the gauntlet of sellers hawking their wares from carts, hopeful that something special will catch your eye.`,
 			duration:.5,
-			//continue:4,
+			continue:4,
 			//bg:``,
-			//dailyConChanges:[],
-			//permConChanges:[],
-			//deed:``
 		},
 		{
 			button:`Head to the main tent`,
 			text:`The Great Pudding Tent seems particularly bustling — you head towards it to see what all the commotion is about.`,
 			duration:.5,
 			//continue:5,
-			//bg:``,
-			//dailyConChanges:[],
-			//permConChanges:[],
-			//deed:``
 		},
 		{
 			button:`Talk to Nanny Cowslip`,
 			text:`Something about the brightly painted chariot catches your eye and you approach Nanny Cowslip's Chariot of Consummate Confections`,
 			duration:0,
 			continue:2,
-			//bg:``,
-			//dailyConChanges:[],
-			//permConChanges:[],
-			//deed:``
 		},
 	],
 	hiddenOptions: [
@@ -411,10 +415,7 @@ const outsideTheInn = {
 			duration:1,
 			//condition: metPuppeteer === true,
 			alreadyDisplayed:false,
-			//continue:0,
-			//bg:``,
 			//dailyConChanges:[savedPuppeteer],
-			//permConChanges:[],
 			deed:`good`
 		},
 	]
@@ -423,38 +424,19 @@ const outsideTheInn = {
 const candyChariot = {
 	intro:`Nanny Cowslip sells candy from the back of a chariot purple chariot with three enlarged kittens on her lap with collars reading Snap, Crackle, and Pop. A jar of glowing jelly beans labeled “MAGIC CANDY” sits on her counter alongside trays of sherbet lemons, honeycomb toffees, and peppermint bonbons. As you come closer, Nanny Cowslip smiles and says, "One good deed gets you one jelly bean! But of course the first one's on me because just being here is doing good for the town."`,
 	return: `When you approach the stall again, Nanny smiles at you and says, "Ooh back again? Well I trust you've done something worth another candy!"`,
-    eventBg: 'img/nanny-cowslip.png',
+    eventBg: 'img/nanny-2.png',
 	options: [
 		{
 			button:`Ask what's in the candy`,
 			text:`When you ask what's in the candy, she looks taken aback. After a few moments she leans in close and says, "Pure magic." You can't quite tell if she's being serious.`,
 			duration:.5,
-			//continue:1,
-			//bg:``,
-			//dailyConChanges:[],
-			//permConChanges:[],
-			//deed:``
 		},
-		{
-			button:`Ask for a candy`,
-			text:`When you request a candy, Nanny laughs and says, "But of course!" and holds the jar out to you with a flourish. "Choose wisely! Every choice is a good one, but it still pays to be smart about it." Candy in hand, you turn back to decide where you want to go.`,
+        {
+			button:`Head away from the cart`,
+			text:`You turn away from the cart, pondering where you'd like to go next.`,
 			duration:.5,
 			continue:1,
-			//bg:``,
-			//dailyConChanges:[],
-			//permConChanges:[],
-			//deed:``
-		},
-		{
-			button:`Reach in and take a candy`,
-			text:`As you reach in, Nanny raises an eyebrow and quips, "well, aren't you bold. But yes, enjoy — but no more until you come back with tales of good deeds." Candy in hand, you turn back to decide where you want to go.`,
-			duration:.5,
-			continue:1,
-			//bg:``,
-			//dailyConChanges:[],
-			//permConChanges:[],
-			//deed:``
-		},
+		}
 	],
 	hiddenOptions: [
 		{
@@ -463,74 +445,166 @@ const candyChariot = {
 			duration:0,
 			//condition: knowCyrrollalee,
 			alreadyDisplayed:false,
-			//continue:0,
+		},
+        {
+			button:`Ask for a candy`,
+			text:`When you request a candy, Nanny laughs and says, "But of course!" and holds the jar out to you with a flourish. "Choose wisely! Every choice is a good one, but it still pays to be smart about it."`,
+			duration:.5,
+			continue:1,
+            condition: takenCandy = false,
+			alreadyDisplayed:true,
 			//bg:``,
-			//dailyConChanges:[],
+			dailyConChanges:[`takenCandy`],
+			//permConChanges:[],
+			//deed:``
+		},
+		{
+			button:`Reach in and take a candy`,
+			text:`As you reach in, Nanny raises an eyebrow and quips, "well, aren't you bold. But yes, enjoy — but no more until you come back with tales of good deeds."`,
+			duration:.5,
+			continue:1,
+            condition: takenCandy = false,
+			alreadyDisplayed:true,
+            //bg:``,
+			dailyConChanges:[`takenCandy`],
 			//permConChanges:[],
 			//deed:``
 		},
 	]
 }
 const carnivalArea = {
-	intro:`Carnival intro`,
+	intro:`Gnomes and halfings young and old are raucously shouting all throughout the wooded games area. While the most puppet show happening just ahead of you is clearly the most popular attraction with a couple dozen children watching raptly, you quickly notice that most of the attending adults have flagons from the cider stand to your left. To your right you see a caricaturist drawing sketches for a few silver pieces each.`,
+	return: `You consider your options again — the puppet fair happening in the large tent, a quick visit to the cider stand, a sketch at the caricaturist, or heading back to the center of town.`,
 	eventBg: 'img/woods-fair.jpg',
 	location:'carnival',
 	options: [
 		{
+			button:`Go to the center of town`,
+			text:`Deciding you'd rather go to a different part of the fair, you head back to the center of town.`,
+			duration:.5,
+			continue:1
+		},
+		{
 			button:`Approach the cider stand`,
-			text:``,
-			duration:0,
-			//continue:0,
-			//bg:``,
-			//dailyConChanges:[],
-			//permConChanges:[],
-			//deed:``
+			text:`There's something alluring about the cider stand's colorful awnings that draws you in — besides, it's hot, and a cool cider sounds nice.`,
+			duration:0
+            //continue:1,
 		},
 		{
 			button:`Visit the caricaturist`,
-			text:``,
-			duration:0,
-			//continue:0,
-			//bg:``,
-			//dailyConChanges:[],
-			//permConChanges:[],
-			//deed:``
+			text:`Looking over at the caricaturist, you can't help but notice that while the halfling is drawing caricatures of fairgoers, hung up around the stall are landscape paintings of local scenery.`,
+			duration:0
+			//continue:1,
 		},
 		{
 			button:`Watch the puppet show`,
-			text:``,
-			duration:0,
-			//continue:0,
-			//bg:``,
-			//dailyConChanges:[],
-			//permConChanges:[],
-			//deed:``
-		},
-        {
-            button:`Go to the center of town`,
-            text:``,
-            duration:.5,
-            continue:1,
-            //bg:``,
-            //dailyConChanges:[],
-            //permConChanges:[],
-            //deed:``
-        }
+			text:`Looking towards the painted puppet stage, you can't help but be impressed with how attentive the young audience is. Walking over, you notice a sign: "The Legend of Mystery Hollow — told every hour on the hour."`,
+			duration:0
+			//continue:1,
+		}
 	],
-	// hiddenOptions: [
-	// 	{
-	// 		button:``,
-	// 		text:``,
-	// 		duration:0,
-	// 		condition: ,
-	// 		alreadyDisplayed:false,
-	// 		//continue:0,
-	// 		//bg:``,
-	// 		//dailyConChanges:[],
-	// 		//permConChanges:[],
-	// 		//deed:``
-	// 	},
-	// ]
+	hiddenOptions: [
+		{
+			button:`SQUISH! A custard hits you in the face`,
+			text:`Suddenly, a custard tart comes flying at you and catches you in the face. After looking around for a minute, you see the culprit: a giggling gnome child who darts away as soon as you make eye contact. Your emotions calm after a minute and you're just thankful it's not a mimic this time. Gods, last week was rough.`,
+			duration:.5,
+			// condition: timeOfDay >= 12 && timeOfDay <= 2,
+			alreadyDisplayed:false,
+			permConChanges:["piedInFace"]
+		},
+		{
+			button:`Duck the incoming custard`,
+			text:`As you stand considering your options, you deftly move a foot to the left as a custard tart comes flying at you. You hear a angry shout from behind you and turn to see the custard hit a very large human who charges after the gnome child.`,
+			duration:.5,
+			// condition: permConditions.piedInFace === true && timeOfDay >= 12 && timeOfDay <= 2,
+			alreadyDisplayed:false,
+			permConChanges:["dodgedPie"],
+		},
+		{
+			button:`Catch the incoming custard`,
+			text:`As you stand considering your options, you reflexively put up your hand and catch the flying custard with a cradling motion and redirect it towards your mouth. As you take a bite, you wink at the gnome child who stares in awe. The custard's flight hasn't made it any less delicious.`,
+			duration:.5,
+			// condition: permConditions.piedInFace === true && timeOfDay >= 12 && timeOfDay <= 2 && permConditions.dodgedPie === true ,
+			alreadyDisplayed:false,
+			deed:`good`
+		}
+	]
+}
+
+const shopsArea = {
+	intro:`Despite being less crowded than some of the other parts of the faire, the shops set up on the south side of the lake prove to be the loudest. Dozens of vendors are shouting about their wares and prices, but three in particular catch your eye. A tabaxi herbalist offering potions, a gnome's yard sale happening on a particularly large green area and a halfling potter whose kiln is set up right next to his stall.`,
+	return: `You look around the shops area, deciding if there are any other stalls you want to visit. There's a tabaxi herbalist offering potions, a gnome's yard sale happening on a particularly large green area and a halfling potter whose kiln is set up right next to his stall.`,
+	eventBg: 'img/market-day.jpeg',
+	location: 'shops',
+	options: [
+		{
+			button:`Return to the center of town`,
+			text:`Deciding you'd rather go to a different part of the fair, you head back to the center of town.`,
+			duration:.5,
+			continue:1
+		},
+		{
+			button:`Visit the herbalist`,
+			text:`The herbalist's stall isn't terribly busy as you approach — which gives you a clear view of the woodland animals carved into the wood of the stall.`,
+			duration:1.5,
+			//continue:0,
+			bg:`img/herbalist.jpeg`,
+		},
+		{
+			button:`Check out the yard sale`,
+			text:`As you head towards the yard sale, it's clear why this takes up so much space: every item is laid out on blankets, with dozens of trinkets priced to move.`,
+			duration:1.5,
+			//continue:0,
+			bg:`img/trinkets.jpeg`,
+		}
+
+	],
+	hiddenOptions: [
+		{
+			button:`Browse the pottery`,
+			text:`The small stall next to the kiln is clearly the busiest stall in the area — as you approach, you see a dozen or so families all holding similar commemorative plates.`,
+			duration:1.5,
+			alreadyDisplayed:true,
+			//continue:0,
+			bg:`img/potter.jpeg`,
+		},
+		{
+			button:`Approach the distressed potter`,
+			text:`While on other days Janphar's stall has been one of the busiest, today he sits sobbing with his head in his hands. No one is in line to buy his plates today.`,
+			duration:1.5,
+			alreadyDisplayed:false,
+			//continue:0,
+			bg:`img/potter.jpeg`,
+			//deed:``
+		}
+	]
+}
+
+const returnToInnAtNight = {
+	intro:`It's starting to get late, and you decide that you've had enough of the fair for one day. Your feet are sore from being out all day and you head is just a bit fuzzy from so much time in the sun.`,
+	secretText: `It's starting to get late, and you decide that you've had enough of the fair for one day. Your feet are sore from being out all day and you head is just a bit fuzzy from so much time in the sun.`,
+	eventBg: '',
+	options: [],
+	hiddenOptions: [
+		{
+			button:`Continue`,
+			text:`In the twilight of the day you make your way back to the inn, ready to put your head down for the night.`,
+			duration:0,
+			condition: goodDeeds < 5,
+			alreadyDisplayed:true,
+			continue:0,
+            bg:`img/town-night.jpg`
+		},
+		{
+			button:`Greet Nanny Cowslip`,
+			text:`In the twilight of the day you make your way back to the inn, ready to put your head down for the night. Standing outside the inn, however, is Nanny Cowslip. As soon as she sees you she starts walking directly towards you.`,
+			duration:0,
+			condition: goodDeeds >= 5,
+			alreadyDisplayed:true,
+            bg:`img/town-night.jpg`
+			//continue:0,
+		}
+	]
 }
 
 // I HATE HOW BOTH OF THESE WORK AND THERE SHOULD BE SOMETHING BETTER BUT I DON'T KNOW WHAT
@@ -539,7 +613,8 @@ const eventOptions = { // I'm setting this up to be called with bracket notation
     0: beginNewDay,
     1: outsideTheInn,
     2: candyChariot,
-    3: carnivalArea
+    3: carnivalArea,
+    4: shopsArea
 }
 
 const resetHiddenConditions = () => {
@@ -547,7 +622,13 @@ const resetHiddenConditions = () => {
     beginNewDay.hiddenOptions[1].condition = dayCount === 3 || dayCount > 4,
     beginNewDay.hiddenOptions[2].condition = dayCount > 3,
     beginNewDay.hiddenOptions[3].condition = dayCount > 3,
-    outsideTheInn.hiddenOptions[0].condition = dayCount >= 2
+    candyChariot.hiddenOptions[1].condition = dailyConditions.takenCandy === false
+    candyChariot.hiddenOptions[2].condition = dailyConditions.takenCandy === false
+    carnivalArea.hiddenOptions[0].condition = timeOfDay >= 12 && timeOfDay <= 13,
+    carnivalArea.hiddenOptions[1].condition = permConditions.piedInFace === true && timeOfDay >= 12 && timeOfDay <= 13,
+    carnivalArea.hiddenOptions[2].condition = permConditions.piedInFace === true && timeOfDay >= 12 && timeOfDay <= 13 && permConditions.dodgedPie === true,
+    shopsArea.hiddenOptions[0].condition = dayCount != 3,
+    shopsArea.hiddenOptions[1].condition = dayCount === 3
 }
 
 // HIDDEN CONDITIONS THAT ARE USED BY EVENTS TO TRIGGER RESULTS
@@ -555,12 +636,12 @@ const resetHiddenConditions = () => {
 // all daily conditions are under 100. Permanent ones are over 100.
 
 const dailyConditions = {
-    'Avoided puddle': true, // prevented stepping in the puddle
-    'Played game': true, // played a game
+    "takenCandy": false
 }
 
 const permConditions = {
-
+    "piedInFace":false,
+    "dodgedPie": false
 }
 
 const resetDailyConditions = () => {
