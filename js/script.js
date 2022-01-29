@@ -24,6 +24,7 @@ let goodDeeds = 0
 let badDeeds = 0
 let timeOfDay = 7
 let partOfTown = 'center'
+let returningTo = []
 
 // FADE IN THE SCREEN IN STAGES ... AND MAKE BUTTON COLORS RANDOM
 
@@ -113,13 +114,22 @@ const newEvent = (eventName) => {
         badDeeds = 0
         resetDailyConditions()
         newHistoryDay() // add a new day header in the history bar
+        returningTo = []
     }
-    addToCurrentText(eventName.intro) // put the intro text in the box for the event
+    if (returningTo.includes(eventName) && eventName.return) {
+        addToCurrentText(eventName.return) // put the returning text in the box for the event
+    } else {
+        addToCurrentText(eventName.intro) // put the intro text in the box for the event
+    }
+    if (eventName.location) {
+        partOfTown = eventName.location
+    }
     createOptionButtons(eventName) // create the option buttons for the event
     if(eventName.eventBg) {
         newBg(eventName.eventBg)
     }
     buttonColorIsRandom()
+    returningTo.push(eventName)
 }
 
 const incrementDeed = (deed) => {
@@ -285,6 +295,7 @@ const buttonColorIsRandom = () => {
 const beginNewDay = {
     intro: `The crow of a rooster awakens you from slumber, followed by the sound of a brass band cranking up. "Roll up! Roll up for the Pudding Faire!” cries a voice from the street below. Peering out the inn’s window, you see a crowd of happy halflings and gnomes bustling toward a fairground on the village green. It is seven o’clock in he morning on the day of the annual Honeypuddle Pudding Faire!`,
 	eventBg: 'img/town-day.jpg',
+    location:'center',
 	options: [
 		{
 			button:`Go back to bed`,
@@ -347,16 +358,179 @@ const beginNewDay = {
 }
 
 const outsideTheInn = {
+	intro:`In the center of town, your senses are assaulted with the sights, sounds and delectable smells of the Pudding Faire. A large banner above "Nanny Cowslip's Chariot of Consummate Confections" offers some direction. To your left, closer to the woods are the carnival games. To the right, stalls are open for casual shopping. Straight ahead, the Pudding Faire's main tent is a flurry of activity. As you consider your decision, a cart blazes through the center of town with a gnome atop it shouting, "THERE'S NO TIME LIKE THE PRESENT!" while he tosses handfuls of candy to nearby children.`,
+	return: `Back at the center of town, you consider your options. To the west, closer to the woods are the carnival games. To the east, stalls are open for casual shopping. To the north, the Pudding Faire's main tent is a flurry of activity. And, of course, there's Nanny Cowslip's chariot.`,
+	location:'center',
     eventBg: 'img/the-faire.png',
-    intro: "This is a test of the event system placed inside of objects. Hopefully it is working properly",
-    options: [
-        {button: "Option 1", duration: 1, text: "You chose option 1", continue: 0}, 
-        {button: "Option 2", duration: 1, text: "You chose option 2", continue: 0},
-    ],
-    hiddenOptions: [
-        {condition: dayCount >= 2, duration: 2, alreadyDisplayed: false, button: "Option 3", text: "You chose option 3 — which should only happen after day 1", continue: 0},
-        {condition: dayCount >= 2, duration: 2, alreadyDisplayed: false, button: "Option 4", text: "You chose option 3 — which should only happen after day 1", continue: 0}
-    ]
+	options: [
+		{
+			button:`Go play some games`,
+			text:`As you walk towards the games you hear a heady mix of shouts from people young and old — some exulting their victories, while others bemoan their luck.`,
+			duration:.5,
+			continue:3,
+			//bg:``,
+			//dailyConChanges:[],
+			//permConChanges:[],
+			//deed:``
+		},
+		{
+			button:`Peruse the shops`,
+			text:`You head off towards the gauntlet of sellers hawking their wares from carts, hopeful that something special will catch your eye.`,
+			duration:.5,
+			//continue:4,
+			//bg:``,
+			//dailyConChanges:[],
+			//permConChanges:[],
+			//deed:``
+		},
+		{
+			button:`Head to the main tent`,
+			text:`The Great Pudding Tent seems particularly bustling — you head towards it to see what all the commotion is about.`,
+			duration:.5,
+			//continue:5,
+			//bg:``,
+			//dailyConChanges:[],
+			//permConChanges:[],
+			//deed:``
+		},
+		{
+			button:`Talk to Nanny Cowslip`,
+			text:`Something about the brightly painted chariot catches your eye and you approach Nanny Cowslip's Chariot of Consummate Confections`,
+			duration:0,
+			continue:2,
+			//bg:``,
+			//dailyConChanges:[],
+			//permConChanges:[],
+			//deed:``
+		},
+	],
+	hiddenOptions: [
+		{
+			button:`Chase the cart`,
+			text:`Remembering that the puppeteer Regis Blossombottom had his hand run over by a cart, you chase down the gnome throwing candy and tell him to be careful — you heard someone was hit by a speeding cart earlier and don't want it to happen again.`,
+			duration:1,
+			//condition: metPuppeteer === true,
+			alreadyDisplayed:false,
+			//continue:0,
+			//bg:``,
+			//dailyConChanges:[savedPuppeteer],
+			//permConChanges:[],
+			deed:`good`
+		},
+	]
+}
+
+const candyChariot = {
+	intro:`Nanny Cowslip sells candy from the back of a chariot purple chariot with three enlarged kittens on her lap with collars reading Snap, Crackle, and Pop. A jar of glowing jelly beans labeled “MAGIC CANDY” sits on her counter alongside trays of sherbet lemons, honeycomb toffees, and peppermint bonbons. As you come closer, Nanny Cowslip smiles and says, "One good deed gets you one jelly bean! But of course the first one's on me because just being here is doing good for the town."`,
+	return: `When you approach the stall again, Nanny smiles at you and says, "Ooh back again? Well I trust you've done something worth another candy!"`,
+    eventBg: 'img/nanny-cowslip.png',
+	options: [
+		{
+			button:`Ask what's in the candy`,
+			text:`When you ask what's in the candy, she looks taken aback. After a few moments she leans in close and says, "Pure magic." You can't quite tell if she's being serious.`,
+			duration:.5,
+			//continue:1,
+			//bg:``,
+			//dailyConChanges:[],
+			//permConChanges:[],
+			//deed:``
+		},
+		{
+			button:`Ask for a candy`,
+			text:`When you request a candy, Nanny laughs and says, "But of course!" and holds the jar out to you with a flourish. "Choose wisely! Every choice is a good one, but it still pays to be smart about it." Candy in hand, you turn back to decide where you want to go.`,
+			duration:.5,
+			continue:1,
+			//bg:``,
+			//dailyConChanges:[],
+			//permConChanges:[],
+			//deed:``
+		},
+		{
+			button:`Reach in and take a candy`,
+			text:`As you reach in, Nanny raises an eyebrow and quips, "well, aren't you bold. But yes, enjoy — but no more until you come back with tales of good deeds." Candy in hand, you turn back to decide where you want to go.`,
+			duration:.5,
+			continue:1,
+			//bg:``,
+			//dailyConChanges:[],
+			//permConChanges:[],
+			//deed:``
+		},
+	],
+	hiddenOptions: [
+		{
+			button:`Confront her about her identity`,
+			text:`As soon as you mention that you know she's really Cyrrollalee, she hushes you and tells you to get in the cart so you can talk. As soon as you step inside, it takes off — proving those wings aren't for show — and touches down on the edge of the woods outside of town.`,
+			duration:0,
+			//condition: knowCyrrollalee,
+			alreadyDisplayed:false,
+			//continue:0,
+			//bg:``,
+			//dailyConChanges:[],
+			//permConChanges:[],
+			//deed:``
+		},
+	]
+}
+const carnivalArea = {
+	intro:`Carnival intro`,
+	eventBg: 'img/woods-fair.jpg',
+	location:'carnival',
+	options: [
+		{
+			button:`Approach the cider stand`,
+			text:``,
+			duration:0,
+			//continue:0,
+			//bg:``,
+			//dailyConChanges:[],
+			//permConChanges:[],
+			//deed:``
+		},
+		{
+			button:`Visit the caricaturist`,
+			text:``,
+			duration:0,
+			//continue:0,
+			//bg:``,
+			//dailyConChanges:[],
+			//permConChanges:[],
+			//deed:``
+		},
+		{
+			button:`Watch the puppet show`,
+			text:``,
+			duration:0,
+			//continue:0,
+			//bg:``,
+			//dailyConChanges:[],
+			//permConChanges:[],
+			//deed:``
+		},
+        {
+            button:`Go to the center of town`,
+            text:``,
+            duration:.5,
+            continue:1,
+            //bg:``,
+            //dailyConChanges:[],
+            //permConChanges:[],
+            //deed:``
+        }
+	],
+	// hiddenOptions: [
+	// 	{
+	// 		button:``,
+	// 		text:``,
+	// 		duration:0,
+	// 		condition: ,
+	// 		alreadyDisplayed:false,
+	// 		//continue:0,
+	// 		//bg:``,
+	// 		//dailyConChanges:[],
+	// 		//permConChanges:[],
+	// 		//deed:``
+	// 	},
+	// ]
 }
 
 // I HATE HOW BOTH OF THESE WORK AND THERE SHOULD BE SOMETHING BETTER BUT I DON'T KNOW WHAT
@@ -364,7 +538,8 @@ const outsideTheInn = {
 const eventOptions = { // I'm setting this up to be called with bracket notation because i want to be able to see the pairs more easily — giving them all names feels weird since they're placeholders to call an already named function?
     0: beginNewDay,
     1: outsideTheInn,
-    // 2: candyStall,
+    2: candyChariot,
+    3: carnivalArea
 }
 
 const resetHiddenConditions = () => {
@@ -372,8 +547,7 @@ const resetHiddenConditions = () => {
     beginNewDay.hiddenOptions[1].condition = dayCount === 3 || dayCount > 4,
     beginNewDay.hiddenOptions[2].condition = dayCount > 3,
     beginNewDay.hiddenOptions[3].condition = dayCount > 3,
-    outsideTheInn.hiddenOptions[0].condition = dayCount >= 2,
-    outsideTheInn.hiddenOptions[1].condition = dayCount >= 2
+    outsideTheInn.hiddenOptions[0].condition = dayCount >= 2
 }
 
 // HIDDEN CONDITIONS THAT ARE USED BY EVENTS TO TRIGGER RESULTS
