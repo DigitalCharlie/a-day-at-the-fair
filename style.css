@@ -125,11 +125,10 @@ input[type="text"] {
 
 #current-text li {
     margin: 10px 0;
+    color:#6e6e6e
 }
-
-#current-options {
-    display:flex;
-    justify-content:center;
+#current-text li:last-of-type {
+    color:#fff;
 }
 
 button {

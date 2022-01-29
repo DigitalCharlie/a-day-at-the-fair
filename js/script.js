@@ -23,6 +23,7 @@ let dayCount = 0
 let goodDeeds = 0
 let badDeeds = 0
 let timeOfDay = 7
+let partOfTown = 'center'
 
 // FADE IN THE SCREEN IN STAGES ... AND MAKE BUTTON COLORS RANDOM
 
@@ -159,13 +160,14 @@ const createOptionButtons = (eventName) => {
 
     if (eventName.hiddenOptions) { // determines if there are hidden options
         for (let i = 0; i < eventName.hiddenOptions.length; i++) { // for the hidden buttons
-            if (eventName.hiddenOptions[i].condition) { // if their hidden conditions are true --> do the stuff above.
+            if (eventName.hiddenOptions[i].condition && !(eventName.hiddenOptions[i].hideAfterClicked === true && eventName.hiddenOptions[i].alreadyClicked === true)) { // if their hidden conditions are true --> do the stuff above.
                 const newBtn = document.createElement('button')
                 newBtn.style.opacity = 0 // don't initially show it
                 newBtn.classList.add("hidden-option") // give it a class that gives it transition styles
                 newBtn.textContent = eventName.hiddenOptions[i].button
                 newBtn.addEventListener('click', ()=>{addToCurrentText(eventName.hiddenOptions[i].text)})
                 newBtn.addEventListener('click', ()=>{advanceTime(eventName.hiddenOptions[i].duration)}) // increases current time
+                newBtn.addEventListener('click', ()=>{eventName.hiddenOptions[i].alreadyClicked = true})                
                 if (eventOptions[eventName.hiddenOptions[i].continue]) {
                     newBtn.addEventListener('click', ()=>{continueButton(eventOptions[eventName.hiddenOptions[i].continue])})  // makes it so clicking the button adds an appropriate continue button
                 } else {
@@ -280,18 +282,68 @@ const buttonColorIsRandom = () => {
 // Each has intro text, which displays, a hidden option condition, and then a count of hidden option — which are always the last number of options.
 // the continue number is associated with the eventOptions object and is used when calling new continue buttons
 
-const beginNewDay = { 
-    eventBg: 'img/town-day.jpg',
+const beginNewDay = {
     intro: `The crow of a rooster awakens you from slumber, followed by the sound of a brass band cranking up. "Roll up! Roll up for the Pudding Faire!” cries a voice from the street below. Peering out the inn’s window, you see a crowd of happy halflings and gnomes bustling toward a fairground on the village green. It is seven o’clock in he morning on the day of the annual Honeypuddle Pudding Faire!`,
-    options: [
-        {button: "Go back to bed", duration: 2, text: "Your head swirls and you decide that this is just too much right now. Perhaps later in the day, after a bit more sleep and a hearty meal from downstairs, the whole situation will feel a bit more manageable."}, 
-        {button: "Dash off to the fair", deed: 'good', duration: 0, continue: 1, bg: 'img/town-day.jpg', text: "You hurry to put on your boots and rush out of the inn, not wanting to waste a single moment of the day."},
-        {button: "Observe for a few minutes", dailyConChanges: ['Avoided puddle','Played game'], duration: .5, bg: 'img/the-faire.png', text: "You gaze out the window and take in the sight of the fair. You see gnomes performing a maypole dance, a halfling tightrope walking above a crowd of spectators, a few dancers juggling knives, and a dozen games of skill and chance."},
-        {button: "Try to remember your dreams", duration: .5, continue: 1, bg: 'img/town-day.jpg', text: "Before getting out of bed, you close your eyes and try to focus on your dreams from the night before — in your mind's eye, you see a white mole with claws of steel laughing in front of  woman turned to stone. It's a bizarre and haunting image."},
-    ],
-    hiddenOptions: [
-        {condition: dayCount === 2, alreadyDisplayed: false, duration: .5, button: "Explore that sense of déjà vu ", continue: 1, bg: 'img/town-day.jpg', text: "Pulling yourself into consciousness, you listen to the sounds outside your window for a moment and swear that what you're hearing is almost identical to what you heard yesterday."}    
-    ]
+	eventBg: 'img/town-day.jpg',
+	options: [
+		{
+			button:`Go back to bed`,
+			text:`Your head swirls and you decide that this is just too much right now. Perhaps later in the day, after a bit more sleep and a hearty meal from downstairs, the whole situation will feel a bit more manageable.`,
+			duration:2,
+		},
+		{
+			button:`Head off to the fair`,
+			text:`You put on your boots and head out of the inn, not wanting to waste a single moment of the day.`,
+			duration:0,
+			continue:1,
+		},
+		{
+			button:`Observe for a few minutes`,
+			text:`You gaze out the window and take in the sight of the fair. You see gnomes performing a maypole dance, a halfling tightrope walking above a crowd of spectators, a few dancers juggling knives, and a dozen games of skill and chance.`,
+			duration:.5,
+			bg:`img/the-faire.png`,
+		},
+		{
+			button:`Try to remember your dreams`,
+			text:`Before getting out of bed, you close your eyes and try to focus on your dreams from the night before — in your mind's eye, you see a white mole with claws of steel laughing in front of woman turned to stone. It's a bizarre and haunting image.`,
+			duration:.5,
+			bg:`img/whitemole.png`,
+		},
+	],
+	hiddenOptions: [
+		{
+			button:`Explore your sense of déjà vu`,
+			text:`Pulling yourself into consciousness, you listen to the sounds outside your window for a moment and swear that what you're hearing is almost identical to what you heard yesterday. Was yesterday a dream? Is today?`,
+			duration:0,
+			condition: dayCount >= 2,
+			alreadyDisplayed:false,
+			hideAfterClicked:true,
+		},
+		{
+			button:`Scream in frustration`,
+			text:`Hearing the same call to "roll up for the Pudding Faire" breaks something in your mind and makes you take a deep breath in before letting out a primal shout. The noise outside pauses for a brief second before continuing.`,
+			duration:0,
+			condition: dayCount === 3 || dayCount > 4,
+			alreadyDisplayed:false,
+		},
+		{
+			button:`Get drunk downstairs`,
+			text:`Considering your options for a moment, you decide that this whole thing is too much and opt to just go downstairs to have a morning pint or four.`,
+			duration:0,
+			condition: dayCount > 3,
+			alreadyDisplayed:false,
+		},
+		{
+			button:`Flee town`,
+			text:`Deciding that this place is decidedly weird, you figure that making a run for it is at least worth a shot. You pack up your things and head away from the town. Fortunately, the next town isn't more than a day's journey, and you'll only need to camp one night. As you lay your head down your say a prayer that the next thing you hear won't be the sound of the fair again.`,
+			duration:13,
+			condition: dayCount > 3,
+			alreadyDisplayed:false,
+			continue: 0,
+			hideAfterClicked:true,
+			bg:`img/woods-camp.jpg`,
+		},
+	]
 }
 
 const outsideTheInn = {
@@ -311,12 +363,16 @@ const outsideTheInn = {
 
 const eventOptions = { // I'm setting this up to be called with bracket notation because i want to be able to see the pairs more easily — giving them all names feels weird since they're placeholders to call an already named function?
     0: beginNewDay,
-    1: outsideTheInn
+    1: outsideTheInn,
+    // 2: candyStall,
 }
 
 const resetHiddenConditions = () => {
-    beginNewDay.hiddenOptions[0].condition = dayCount === 2
-    outsideTheInn.hiddenOptions[0].condition = dayCount >= 2
+    beginNewDay.hiddenOptions[0].condition = dayCount >= 2,
+    beginNewDay.hiddenOptions[1].condition = dayCount === 3 || dayCount > 4,
+    beginNewDay.hiddenOptions[2].condition = dayCount > 3,
+    beginNewDay.hiddenOptions[3].condition = dayCount > 3,
+    outsideTheInn.hiddenOptions[0].condition = dayCount >= 2,
     outsideTheInn.hiddenOptions[1].condition = dayCount >= 2
 }
 
