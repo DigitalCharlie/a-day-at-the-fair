@@ -399,7 +399,7 @@ const outsideTheInn = {
 			button:`Head to the main tent`,
 			text:`The Great Pudding Tent seems particularly bustling — you head towards it to see what all the commotion is about.`,
 			duration:.5,
-			//continue:5,
+			continue:5,
 		},
 		{
 			button:`Talk to Nanny Cowslip`,
@@ -413,9 +413,16 @@ const outsideTheInn = {
 			button:`Chase the cart`,
 			text:`Remembering that the puppeteer Regis Blossombottom had his hand run over by a cart, you chase down the gnome throwing candy and tell him to be careful — you heard someone was hit by a speeding cart earlier and don't want it to happen again.`,
 			duration:1,
-			//condition: metPuppeteer === true,
+			//condition: metPuppeteer === true && timeOfDay < 8,
 			alreadyDisplayed:false,
 			//dailyConChanges:[savedPuppeteer],
+			deed:`good`
+		},
+        {
+			button:`Follow the deep footprints`,
+			text:`As you head out of town it gets easier and easier to follow the deep, gnome-sized footprints heading out to the woods. There isn't much traffic this way, and the other footprints you see clearly belong to tall folk.`,
+			duration:1,
+			alreadyDisplayed:false,
 			deed:`good`
 		},
 	]
@@ -479,7 +486,7 @@ const carnivalArea = {
 	location:'carnival',
 	options: [
 		{
-			button:`Go to the center of town`,
+			button:`Return to the center of town`,
 			text:`Deciding you'd rather go to a different part of the fair, you head back to the center of town.`,
 			duration:.5,
 			continue:1
@@ -607,6 +614,105 @@ const returnToInnAtNight = {
 	]
 }
 
+const mainTent1 = {
+	intro:`As you approach the Great Pudding Tent you are surrounded by a flurry of activity. Gnomes and halflings are running across tables, racing towards the center tables. Onlookers are hurling food at them — mostly soft, squishy vegetables, like past-ripe tomatoes — and after you see a gnome reach the center table, his time is recorded on a nearby chalkboard.`,
+	eventBg: 'img/main-tent.jpg',
+    location: "main tent",
+	options: [],
+	hiddenOptions: [
+		{
+			button:`Continue towards the tent`,
+			text:`You hear joyous giggles as you get closer to the throng of gnomes and halflings admiring the largest fruitcake you've ever seen.`,
+			duration:0,
+			condition: timeOfDay < 12.5,
+			alreadyDisplayed:true,
+			continue:6,
+		},
+		{
+			button:`Continue towards the tent`,
+			text:`In stark contrast to the joyous atmosphere at rest of the fair, there's a nervous energy as you approach the Great Pudding.`,
+			duration:0,
+			condition: timeOfDay >= 12.5,
+			alreadyDisplayed:true,
+			continue:7,
+		},
+	]
+}
+
+const mainTent2 = {
+	intro:`Stout tables and benches radiate around the Great Pudding: a fruitcake almost ten feet in diameter. People all around are talking about the feast in excited tones.`,
+	eventBg: '',
+	options: [
+		{
+			button:`Return to the center of town`,
+			text:`Deciding you'be seen enough of the Great Pudding Tent, you head back to the center of town.`,
+			duration:.5,
+			continue:1
+		},
+		{
+			button:`Ask what the big deal is`,
+			text:`A halfling next to you scoffs. "What's the big deal? This is the most exciting festival of the year for all of us in Honeypuddle! It brings old friends and new, delicious food, and so much more. If you don't appreciate it, you should probably just go." With a hrumph he walks around the fruitcake to the otherside so he can gaze at the fruitcake without having to look at you.`,
+			duration:.5,
+		},
+		{
+			button:`Ask what will happen at the feast`,
+			text:`Turning to your side, you ask a nearby gnome what will happen tonight. She responds, "Well, feasts are held here throughout the day, with guests coming and going as they please. The Great Pudding remains untouched until sundown, when the villagers bless it with song and slice it up using a two-man saw wielded by a gnome and a halfling. After the feast, the patrons have a grand storytelling session and then pull the tables aside to dance until midnight." She lets out a sigh. "It's truly beautiful."`,
+			duration:.5,
+		},
+		{
+			button:`Gaze longingly at the fruitcake`,
+			text:`As you examine the fruitcake, you keep noticing finer and finer details — little flourishes in the icing, the perfect distribution of fruit across the surface, how even the bake it. It's truly a baking marvel — clear even from the outside that it is baked all the way through without even a hint of a soggy bottom.`,
+			duration:1,
+		},
+	],
+	hiddenOptions: []
+}
+
+const mainTent3 = {
+	intro:`Stout tables and benches radiate around the Great Pudding: a fruitcake almost ten feet in diameter. As you get closer, you see gnomes and halflings standing in worried knots, talking rapidly.`,
+	eventBg: '',
+	options: [
+		{
+			button:`Return to the center of town`,
+			text:`Deciding don't want anything to do with what has happened here, you head back to the center of town.`,
+			duration:.5,
+			continue: 1,
+        },
+		{
+			button:`Ask what happened`,
+			text:`You ask a few people what happened, but the clearest explanation comes from a child who spits out the tale rapidly. "The mayor told this guy who talked bad that he needed to go and then the guy said NO and then there was this big sound and now LOOK the mayor's wife is holding on to that toad BUT THE TOAD IS THE MAYOR hehehehehe our mayor croaked but he's still alive hahahaha.`,
+			duration:0,
+			//continue:0,
+			//bg:``,
+			//dailyConChanges:[],
+			//permConChanges:[],
+			//deed:``
+		},
+		{
+			button:`Try to eavesdrop`,
+			text:`You move around the crowd, trying to hear what's happened. "Can you believe the mayor got turned into a FROG?! It's just awful!" says one gnome. "That drunk dude blew some green powder in his face, then poof! Frog. See, I told you no good comes from folks who prefer to sleep in Threepenny Wood." replies another. Moving around, you gather that Mayor Barleydew asked the gnome to leave because he was disturbing the locals with his creepy talk and bad attitude.`,
+			duration:0,
+			//continue:0,
+			//bg:``,
+			dailyConChanges:['footprintsToWoods'],
+			//permConChanges:[],
+			//deed:``
+		},
+		{
+			button:`Do a little investigating`,
+			text:`Deciding to poke around a bit, you're having trouble telling footprints apart — there are a lot of people milling around — but as you head back towards the center of town, you notice some deeper footprints leading to Threepenny Wood. Looks like someone put a lot of force into their step.`,
+			duration:0,
+			continue:1,
+			//bg:``,
+			dailyConChanges:['footprintsToWoods'],
+			//permConChanges:[],
+			//deed:``
+		},
+	],
+	hiddenOptions: []
+}
+
+
 // I HATE HOW BOTH OF THESE WORK AND THERE SHOULD BE SOMETHING BETTER BUT I DON'T KNOW WHAT
 
 const eventOptions = { // I'm setting this up to be called with bracket notation because i want to be able to see the pairs more easily — giving them all names feels weird since they're placeholders to call an already named function?
@@ -614,7 +720,10 @@ const eventOptions = { // I'm setting this up to be called with bracket notation
     1: outsideTheInn,
     2: candyChariot,
     3: carnivalArea,
-    4: shopsArea
+    4: shopsArea,
+    5: mainTent1,
+    6: mainTent2,
+    7: mainTent3
 }
 
 const resetHiddenConditions = () => {
@@ -622,13 +731,16 @@ const resetHiddenConditions = () => {
     beginNewDay.hiddenOptions[1].condition = dayCount === 3 || dayCount > 4,
     beginNewDay.hiddenOptions[2].condition = dayCount > 3,
     beginNewDay.hiddenOptions[3].condition = dayCount > 3,
+    outsideTheInn.hiddenOptions[1].condition = dailyConditions.footprintsToWoods === true,
     candyChariot.hiddenOptions[1].condition = dailyConditions.takenCandy === false
     candyChariot.hiddenOptions[2].condition = dailyConditions.takenCandy === false
     carnivalArea.hiddenOptions[0].condition = timeOfDay >= 12 && timeOfDay <= 13,
     carnivalArea.hiddenOptions[1].condition = permConditions.piedInFace === true && timeOfDay >= 12 && timeOfDay <= 13,
     carnivalArea.hiddenOptions[2].condition = permConditions.piedInFace === true && timeOfDay >= 12 && timeOfDay <= 13 && permConditions.dodgedPie === true,
     shopsArea.hiddenOptions[0].condition = dayCount != 3,
-    shopsArea.hiddenOptions[1].condition = dayCount === 3
+    shopsArea.hiddenOptions[1].condition = dayCount === 3,
+    mainTent1.hiddenOptions[0].condition = timeOfDay < 12.5,
+    mainTent1.hiddenOptions[1].condition = timeOfDay >= 12.5
 }
 
 // HIDDEN CONDITIONS THAT ARE USED BY EVENTS TO TRIGGER RESULTS
@@ -636,7 +748,8 @@ const resetHiddenConditions = () => {
 // all daily conditions are under 100. Permanent ones are over 100.
 
 const dailyConditions = {
-    "takenCandy": false
+    "takenCandy": false,
+    "footprintsToWoods": false
 }
 
 const permConditions = {
@@ -682,4 +795,6 @@ Possible pitfalls:
 - will have some slightly redundant events that will serve as continuations — need to do something for after they select a few options how buttons may change.
     - ex: can they pick all the options in the room before having to continue? Or after a couple does it force forwards (if possible)?
 
+FUTURE
+- move the whole thing to humblewood, which could give it consistent art? or be fine with the varying styles or something.
 */
