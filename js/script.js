@@ -20,7 +20,7 @@ const bg = document.getElementById('bg')
 // VARIABLES THAT STRUCTURE THE GAME PLAY
 // should have wrapped it inside of game objects, but I did not.
 
-let dayCount = 0
+let dayCount = 3
 let goodDeeds = 0
 let badDeeds = 0
 let timeOfDay = 7
@@ -40,6 +40,7 @@ class Adventurer {
         this.trinkets = []
         this.finalDaysTally = ''
         this.currentTrinket = ''
+        this.jokes = []
     }
     finalDaysTally () {
         this.finalDaysTally = dayCount
@@ -49,6 +50,11 @@ class Adventurer {
             this.trinkets.push(item);
         }
         this.currentTrinket = item;
+    }
+    newJoke (joke) {
+        if(this.jokes.indexOf(joke) === -1) {
+            this.jokes.push(joke);
+        }
     }
 }
 
@@ -118,7 +124,7 @@ const advanceTime = (timeTaken) => {
 
 const changeDailyConditions = (condition) => {
     for (i = 0; i < condition.length; i++) {
-        dailyConditions[condition[i]] = true
+        typeof dailyConditions[condition[i]] === "number" ? dailyConditions[condition[i]]++ : dailyConditions[condition[i]] = true
     }
 }
 
@@ -182,7 +188,7 @@ const createOptionButtons = (eventName) => {
                 const continueTo = typeof option.continue === 'function' ? option.continue() : option.continue // Thank you to my friend Max for explaining how ternaries work
                 if (continueTo) { // checks if there is a continue location — if yes, display it.
                    continueButton(continueTo)  // makes it so clicking the button adds an appropriate continue button
-                } else {
+                } else if (option.repeatable != true) {
                    removeSelectedButton(newBtn) // if no continue condition, then just remove the selected option after adding the text.
                 }
                 if (option.deed) {
@@ -191,11 +197,11 @@ const createOptionButtons = (eventName) => {
                 if (option.bg) {
                     newBg(option.bg)
                 }
-                if (option.buttonFunction) {
-                    option.buttonFunction()
-                }
                 if (option.dailyConChanges) {
                     changeDailyConditions(option.dailyConChanges)
+                }
+                if (option.buttonFunction) {
+                    option.buttonFunction()
                 }
                 if (option.permConChanges) {
                     changePermConditions(option.permConChanges)
@@ -322,14 +328,18 @@ let todaysTrinkets = []
 const refreshTrinkets = () => {
   todaysTrinkets.length = 0
   for (let i = 0; i < 4; i++) {
-      let num = Math.floor(Math.random() * 100);
-      if(todaysTrinkets.indexOf(allTrinkets[num]) === -1) todaysTrinkets.push(allTrinkets[num]);
+        let num = Math.floor(Math.random() * 100);
+        if(todaysTrinkets.indexOf(allTrinkets[num]) === -1) todaysTrinkets.push(allTrinkets[num]);
   }
   for (i = 0; i < todaysTrinkets.length; i++) {
-    yardSale.options[i+1].button = todaysTrinkets[i]
-    yardSale.options[i+1].text = `You decide to purchase `+ todaysTrinkets[i] + ` and put it away in your bag before heading back towards the other shops.` 
+        yardSale.options[i+1].button = todaysTrinkets[i]
+        yardSale.options[i+1].text = `You decide to purchase `+ todaysTrinkets[i] + ` and put it away in your bag before heading back towards the other shops.` 
+    }
 }
-}
+
+// RANDOM JOKES!
+
+const allJokes = [`"After that, I went to work at a calendar factory, but I got fired because I missed a few days."`, `"Then I got a job at a clock factory, but I got fired after putting in a lot of extra hours."`, `"I once went for a job interview at a morgue. The mortician said he was looking for someone responsible. I told him that in my last job, whenever anything went wrong, they said I was responsible. I didn't get the job."`, `"After that, I started a gym, but it didn't work out. So that's how I became a jester – there was almost nothing else left to try!"`, `"Growing up, we never had decent food. Every evening I'd ask what we were having for dinner, and my pop would said the same thing, "leftovers.” Every day it was leftovers! We never found the original meal. That’s not like the food here, which is delicious."`, `"I can’t wait to try that pudding, it looks incredible! Hey, you know what the best thing to put into a pudding is? Your teeth!"`, `"Anyway, I don’t think you’ll keep pudding up with me for much longer, so I’ll bid you good day. May Cyrrollalee, the god of hospitality, be with you all! Farewell!"`]
 
 // EVENT DATABASE
 // Each has intro text, which displays, a hidden option condition, and then a count of hidden option — which are always the last number of options.
@@ -393,8 +403,9 @@ const beginNewDay = new FairEvent ({
 		},
 		{
 			button:`Get drunk downstairs`,
-			text:`Considering your options for a moment, you decide that this whole thing is too much and opt to just go downstairs to have a morning pint or four.`,
+			text:`Considering your options for a moment, you decide that this whole thing is too much and opt to just go downstairs to have a morning pint or four. Plus, now you can see whether hangovers carry over.`,
 			duration:0,
+            continue: () => daytimeInn,
 			condition: () => dayCount > 3,
 			alreadyDisplayed: false,
 		},
@@ -463,6 +474,14 @@ const outsideTheInn = new FairEvent ({
 			alreadyDisplayed:false,
 			deed:`good`,
             condition: () => dailyConditions.footprintsToWoods === true
+		},
+        {
+			button:`Head out of town to look for Arabella`,
+			text:`You head out of town on the main road to look for Arabella. A mile outside of town you discover her wagon abandoned on the side of the road, along and a trail of tall-folk boot prints leading to the woods.`,
+			duration:1,
+			alreadyDisplayed:false,
+			deed:`good`,
+            condition: () => dailyConditions.arabellaMissing === true
 		},
 	]
 })
@@ -586,6 +605,11 @@ const shopsArea = new FairEvent ({
 	returningIntro: `You look around the shops area, deciding if there are any other stalls you want to visit. There's a tabaxi herbalist offering potions, a gnome's yard sale happening on a particularly large green area and a halfling potter whose kiln is set up right next to his stall.`,
 	eventBg: 'img/market-day.jpeg',
 	location: 'shops',
+    initialize: () => {
+        if (dayCount === 4) {
+            currentText.lastElementChild.textContent += " Wait — where's Arabella? The herbalist's wagon is missing."
+        }
+    },
 	options: [
 		{
 			button:`Return to the center of town`,
@@ -599,6 +623,7 @@ const shopsArea = new FairEvent ({
 			duration:1.5,
 			//continue:0,
 			bg:`img/herbalist.jpeg`,
+            condition: () => dayCount != 4
 		},
 		{
 			button:`Check out the yard sale`,
@@ -623,7 +648,15 @@ const shopsArea = new FairEvent ({
 			alreadyDisplayed:false,
             condition: () => dayCount === 3,
 			bg:`img/potter.jpeg`,
-		}
+		},
+        {
+            button: `Ask around about Arabella`,
+            text: `Confused that Arabella's wagon is missing, you ask other vendors about where she is, but you get little information other than broad speculation that she may have slipped a wheel on the way in to town.`,
+            duration:1,
+            condition: () => dayCount === 4,
+            alreadyDisplayed: false,
+            dailyConChanges: ["arabellaMissing"]
+        }
 	]
 })
 
@@ -648,7 +681,7 @@ const returnToInnAtNight = new FairEvent ({
 			duration:0,
 			alreadyDisplayed:true,
             bg:`img/town-night.jpg`,
-            condition: () => goodDeeds >= 4
+            condition: () => goodDeeds >= 4,
 			//continue:0,
 		}
 	]
@@ -849,6 +882,110 @@ const yardSale = new FairEvent ({
 	]
 })
 
+const daytimeInn = new FairEvent ({
+	intro:`As it is everyday, when you head downstairs the inn is already alive with gnomes and halflings talking boistrously over half-drank flagons. Looking around, you see an open spot at the bar to order some drinks, a table in the corner where you can drink away the day, and a halfling jester perched on a small wooden stage wearing a colorful cap shaped like a pair of donkey ears.`,
+	eventBg: 'img/inside-the-inn.jpeg',
+	options: [
+		{
+			button:`Decide to go out to the fair`,
+			text:`After taking another look around you decide that, you know what, maybe today is a fair day after all.`,
+			duration:0,
+			buttonFunction: () => {
+				if (dailyConditions.beersToday < 5) {
+					newEvent(outsideTheInn)
+				} else {
+					addToCurrentText(`You start stumbling towards the fair, but those 5 ales did more to cure your sobriety than you expected. Halfway to the door your face plant and your vision goes dark.`)
+					continueButton(beginNewDay)
+				}
+			}
+		},
+		{
+			button:`Order a pint`,
+			text:`You toss down a silver piece and ask for a pint. The innkeeper, Petunia Peppergrass, obliges quickly and slides a full flagon over to you, causing a little foam to spill over the top.`,
+			duration:.5,
+			buttonFunction: () => {
+				newEvent(daytimeInn)
+			},
+            condition: () => dailyConditions.orderedFirst != true,
+			dailyConChanges:["orderedFirst", "beersToday"],
+		},
+		{
+			button:`Order three pints`,
+			text:`You decide you may as well just order in bulk and save yourself some time. It's going to be that kind of day. You notice a couple of eyebrows since you don't have any friends with you, but the ale will cure that concern.`,
+			duration:3,
+			dailyConChanges:["beersToday","beersToday","beersToday"],
+		},
+			{
+			button:`Sit at the table in the corner`,
+			text:`You don't always want to brood in a corner, but today it seems really, deeply appealing. Plus, there's table service which makes it easier to keep on drinking.`,
+            bg:'img/corner-table.jpeg',
+			duration:1,
+		},
+		{
+			button:`Toss a coin to the jester`,
+            bg: 'img/the-jester.jpeg',
+			text:`As you get closer to her tin cup, Poppy Lackwit nods encouragingly — and when your coin drops in she gets up and does a little jig before telling a joke.`,
+			duration:.5,
+            continue: () => standUpComedy,
+            condition: () => dailyConditions.jokeCount < 7
+		},
+		{
+			button:`Chug your pint and order another`,
+			text:`You down your pint and slap down another silver piece. Who needs sobriety in a time loop, anyway.`,
+			duration:1,
+			condition: () => dailyConditions.orderedFirst === true,
+			dailyConChanges:["beersToday"],
+            alreadyDisplayed: false
+		},
+        {
+            button: `Give Poppy a few joke notes`,
+            bg: 'img/the-jester.jpeg',
+            text: `You let Poppy know, that as a fan, you think she should cut the leftovers joke — it still needs some refinement. The rest, though, you assure her, are gold.`,
+            deed: "good",
+            alreadyDisplayed:false,
+            condition: () => permConditions.poppysRoutine === true && dailyConditions.jokeCount < 7,
+            dailyConChanges:["improvedRoutine"]
+        }
+
+	]
+})
+
+const standUpComedy = new FairEvent ({
+    intro: `"I’ve not always been a jester. I used to work in a bank, but I lost my job: a woman asked me to check her balance and I pushed her over."`,
+	eventBg: 'img/the-jester.jpeg',
+	options: [
+        {
+            button:`Groan and walk away`,
+            text:`Puns are not your thing today and after hearing that one you turn on a heel and go right back to the bar.`,
+            continue: () => daytimeInn,
+            duration: .5
+        },
+        {
+            button:`Cheer and encourage Poppy`,
+            buttonFunction: () => {
+                if (dailyConditions.jokeCount < 7) {
+                    if (dailyConditions.improvedRoutine === true && dailyConditions.jokeCount === 4) {
+                        dailyConditions.jokeCount++
+                    } 
+                    addToCurrentText(allJokes[dailyConditions.jokeCount])
+                    timeOfDay += .34
+                } else {
+                    if (dailyConditions.improvedRoutine === true) {
+                        addToCurrentText(`Poppy takes a deep bow and basks in your applause — and with the claps from behind you combined with Poppy's reaction, this is clearly the best her set has ever been received. You turn back to the rest of the inn.`)
+                    } else {
+                        addToCurrentText(`Poppy takes a deep bow and basks in your applause — though with a few scattered boos and coughs from behind you, it's clear not everyone loved it. You turn back to the rest of the inn.`)
+                    }
+                    continueButton(daytimeInn)
+                    goodDeeds++
+                    changePermConditions(["poppysRoutine"])
+                }
+            },
+            repeatable: true,
+            dailyConChanges: ["jokeCount"]
+        }
+    ]
+})
+
 // LIST OF CONDITIONS, MOSTLY FOR REFERENCE SINCE THEY DON'T NEE TO EXIST UNTIL I CREATE THEM.
 
 const dailyConditions = {
@@ -856,20 +993,32 @@ const dailyConditions = {
     "footprintsToWoods": false,
     "calmedBertus":false,
     "piedToday": false,
-    "purchasedTrinket": false
+    "purchasedTrinket": false,
+    "beersToday": 0,
+    "jokeCount": 0,
+    "improvedRoutine": false,
+    "arabellaMissing":false
 }
 
 const permConditions = {
     "piedInFace":false,
     "dodgedPie": false,
-    "knowHowToCalmCaric": false
+    "knowHowToCalmCaric": false,
+    "poppysRoutine":false
 }
 
-const resetDailyConditions = () => { // for all the daily conditions, set them to false
+const resetDailyConditions = () => { // for all the daily conditions, set them to false or 0, depending
     for (condition in dailyConditions) {
-        dailyConditions[condition] = false;
+        typeof dailyConditions[condition] === 'number' ? dailyConditions[condition] = 0 : dailyConditions[condition] = false
     }
 }
+
+const resetPermConditions = () => { // for all the permanent conditions, set them to false or 0, depending — this is only used in whole game reset.
+    for (condition in permConditions) {
+        typeof permConditions[condition] === 'number' ? permConditions[condition] = 0 : permConditions[condition] = false
+    }
+}
+
 
 
 // SET THE VH BASED ON WINDOW SIZE BECAUSE MOBILE VH IS ANNOYING.
