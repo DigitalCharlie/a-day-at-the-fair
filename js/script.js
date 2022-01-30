@@ -1,4 +1,4 @@
-let adventurer = ""
+const adventurers = []
 
 const body = document.body
 
@@ -18,13 +18,14 @@ const closeHistoryButton = document.getElementById('close-history')
 const bg = document.getElementById('bg')
 
 // VARIABLES THAT STRUCTURE THE GAME PLAY
+// should have wrapped it inside of game objects, but I did not.
 
 let dayCount = 0
 let goodDeeds = 0
 let badDeeds = 0
 let timeOfDay = 7
 let partOfTown = 'center'
-let returningTo = []
+const returningTo = []
 
 // FADE IN THE SCREEN IN STAGES ... AND MAKE BUTTON COLORS RANDOM
 
@@ -33,14 +34,30 @@ textBox.classList.add('fade-in')
 
 // NAME YOURSELF AND THEN START THE GAME
 
+class Adventurer {
+    constructor (name) {
+        this.name = name
+        this.trinkets = []
+        this.finalDaysTally = ''
+    }
+    finalDaysTally () {
+        this.finalDaysTally = dayCount
+    }
+    newTrinket (item) {
+        if(this.trinkets.indexOf(item) === -1) {
+            this.trinkets.push(item);
+        }
+    }
+}
+
 const nameAdventurer = () => {
     if (nameInput.value) { // If the name input is not blank
-        adventurer = nameInput.value; // name them the input value
+        adventurers.push(new Adventurer(nameInput.value)) // name them the input value
         nameInput.blur() // blur the field so they don't hit enter a bunch and change it
     } else {
-        adventurer = "Traveler" // default if it is blank — this will get used as easter egg dialogue later
+        adventurers.push(new Adventurer("Traveler")) // default if it is blank — this will get used as easter egg dialogue later
     }
-    console.log('Adventurer is now named ' + adventurer)
+    console.log('Adventurer is now named ' + adventurers[0].name)
     textBox.classList.add('text-adventure-justify')
     introText.hidden = true
     currentText.hidden = false
@@ -119,7 +136,7 @@ const newEvent = (eventName) => {
         badDeeds = 0
         resetDailyConditions()
         newHistoryDay() // add a new day header in the history bar
-        returningTo = []
+        returningTo.length = 0
     }
     if (returningTo.includes(eventName) && eventName.return) {
         addToCurrentText(eventName.return) // put the returning text in the box for the event
@@ -144,30 +161,64 @@ const incrementDeed = (deed) => {
         badDeeds++
     }
 }
-//damnit could this whole thing have been written so it's like... "current event" and then it does all the evaluation when the button is clicked rather than adding event listeners like this? Oof.
+// damnit could this whole thing have been written so it's like... "current event" and then it does all the evaluation when the button is clicked rather than adding event listeners like this? Oof.
+// this is also overcomplicated — it should just be that everything has conditions and displays if appropriate. 
+
+// const createOptionButtons = (eventName) => {
+//     for (let i = 0; i < eventName.options.length; i++) { // for all the non-hidden options
+//         const newBtn = document.createElement('button') // create a button
+//         newBtn.textContent = eventName.options[i].button // make the name of the button
+//         newBtn.addEventListener('click', ()=>{addToCurrentText(eventName.options[i].text)}) // makes it so clicking the button adds text to the li
+//         newBtn.addEventListener('click', ()=>{advanceTime(eventName.options[i].duration)}) // increases current time
+//         if (eventOptions[eventName.options[i].continue]) { // checks if there is a continue location — if yes, display it.
+//             newBtn.addEventListener('click', () => continueButton(eventOptions[eventName.options[i].continue]))  // makes it so clicking the button adds an appropriate continue button
+//         } else {
+//             newBtn.addEventListener('click', () => removeSelectedButton(newBtn)) // if no continue condition, then just remove the selected option after adding the text.
+//         }
+//         if (eventName.options[i].deed) {
+//             newBtn.addEventListener('click', () => incrementDeed(eventName.options[i].deed)) 
+//         }
+//         if (eventName.options[i].bg) {
+//             newBtn.addEventListener('click', ()=>{newBg(eventName.options[i].bg)}) 
+//         }
+//         if (eventName.options[i].dailyConChanges) {
+//             newBtn.addEventListener('click', ()=>{changeDailyConditions(eventName.options[i].dailyConChanges)}) 
+//         }
+//         if (eventName.options[i].permConChanges) {
+//             newBtn.addEventListener('click', ()=>{changePermConditions(eventName.options[i].permConChanges)}) 
+//         }
+//         optionsBox.appendChild(newBtn) // adds a new button
+//     }
+
 const createOptionButtons = (eventName) => {
     for (let i = 0; i < eventName.options.length; i++) { // for all the non-hidden options
+        const option = eventName.options[i]
         const newBtn = document.createElement('button') // create a button
-        newBtn.textContent = eventName.options[i].button // make the name of the button
-        newBtn.addEventListener('click', ()=>{addToCurrentText(eventName.options[i].text)}) // makes it so clicking the button adds text to the li
-        newBtn.addEventListener('click', ()=>{advanceTime(eventName.options[i].duration)}) // increases current time
-        if (eventOptions[eventName.options[i].continue]) { // checks if there is a continue location — if yes, display it.
-            newBtn.addEventListener('click', ()=>{continueButton(eventOptions[eventName.options[i].continue])})  // makes it so clicking the button adds an appropriate continue button
-        } else {
-            newBtn.addEventListener('click', ()=>{removeSelectedButton(newBtn)}) // if no continue condition, then just remove the selected option after adding the text.
-        }
-        if (eventName.options[i].deed) {
-            newBtn.addEventListener('click', ()=>{incrementDeed(eventName.options[i].deed)}) 
-        }
-        if (eventName.options[i].bg) {
-            newBtn.addEventListener('click', ()=>{newBg(eventName.options[i].bg)}) 
-        }
-        if (eventName.options[i].dailyConChanges) {
-            newBtn.addEventListener('click', ()=>{changeDailyConditions(eventName.options[i].dailyConChanges)}) 
-        }
-        if (eventName.options[i].permConChanges) {
-            newBtn.addEventListener('click', ()=>{changePermConditions(eventName.options[i].permConChanges)}) 
-        }
+        newBtn.textContent = option.button // make the name of the button
+        newBtn.addEventListener('click', ()=>{
+            addToCurrentText(option.text)
+            advanceTime(option.duration)
+            const continueTo = typeof option.continue === 'function' ? option.continue() : option.continue
+            if (eventOptions[continueTo]) { // checks if there is a continue location — if yes, display it.
+               continueButton(eventOptions[continueTo])  // makes it so clicking the button adds an appropriate continue button
+            } else {
+               removeSelectedButton(newBtn) // if no continue condition, then just remove the selected option after adding the text.
+            }
+            if (option.deed) {
+                incrementDeed(option.deed)
+            }
+            if (option.bg) {
+                newBg(option.bg)
+            }
+            if (option.dailyConChanges) {
+                changeDailyConditions(option.dailyConChanges)
+            }
+            if (option.permConChanges) {
+                changePermConditions(option.permConChanges)
+            }
+        }) // makes it so clicking the button adds text to the li
+        
+        
         optionsBox.appendChild(newBtn) // adds a new button
     }
 
@@ -175,7 +226,7 @@ const createOptionButtons = (eventName) => {
 
     if (eventName.hiddenOptions) { // determines if there are hidden options
         for (let i = 0; i < eventName.hiddenOptions.length; i++) { // for the hidden buttons
-            if (eventName.hiddenOptions[i].condition && !(eventName.hiddenOptions[i].hideAfterClicked === true && eventName.hiddenOptions[i].alreadyClicked === true)) { // if their hidden conditions are true --> do the stuff above.
+            if (typeof eventName.hiddenOptions[i].condition === 'function' && eventName.hiddenOptions[i].condition() && !(eventName.hiddenOptions[i].hideAfterClicked === true && eventName.hiddenOptions[i].alreadyClicked === true)) { // if their hidden conditions are true --> do the stuff above.
                 const newBtn = document.createElement('button')
                 newBtn.style.opacity = 0 // don't initially show it
                 newBtn.classList.add("hidden-option") // give it a class that gives it transition styles
@@ -202,13 +253,12 @@ const createOptionButtons = (eventName) => {
                 }
                 optionsBox.appendChild(newBtn)
                 if (eventName.hiddenOptions[i].alreadyDisplayed === false) {
-                    setTimeout(()=> {newBtn.style.opacity = 1},1000) // after 1.5s, then set the opacity of the hidden buttons to 1.
+                    setTimeout(()=> {newBtn.style.opacity = 1},1000) // after 1s, then set the opacity of the hidden buttons to 1.
                     eventName.hiddenOptions[i].alreadyDisplayed = true
                 } else {
                     newBtn.style.opacity = 1
                 }
             }
-
         }
     }
 }
@@ -309,8 +359,22 @@ const buttonColorIsRandom = () => {
 // EVENT DATABASE
 // Each has intro text, which displays, a hidden option condition, and then a count of hidden option — which are always the last number of options.
 // the continue number is associated with the eventOptions object and is used when calling new continue buttons
+// This would have been better to do through a class — but it's way too late for me to figure out on this timeline.
 
-const beginNewDay = {
+class FairEvent {
+    constructor ({intro, eventBg, location, options, hiddenOptions, returningIntro}) {
+        this.intro = intro
+        this.eventBg = eventBg
+        this.location = location
+        this.options = options
+        this.hiddenOptions = hiddenOptions
+        this.returningIntro = returningIntro
+    }
+}
+
+let beginNewDay, outsideTheInn, mainTent1, carnivalArea
+
+beginNewDay = new FairEvent ({
     intro: `The crow of a rooster awakens you from slumber, followed by the sound of a brass band cranking up. "Roll up! Roll up for the Pudding Faire!” cries a voice from the street below. Peering out the inn’s window, you see a crowd of happy halflings and gnomes bustling toward a fairground on the village green. It is seven o’clock in he morning on the day of the annual Honeypuddle Pudding Faire!`,
 	eventBg: 'img/town-day.jpg',
     location:'center',
@@ -344,7 +408,7 @@ const beginNewDay = {
 			button:`Explore your sense of déjà vu`,
 			text:`Pulling yourself into consciousness, you listen to the sounds outside your window for a moment and swear that what you're hearing is almost identical to what you heard yesterday. Was yesterday a dream? Is today?`,
 			duration:0,
-			condition: dayCount >= 2,
+			condition: () => dayCount >= 2,
 			alreadyDisplayed:false,
 			hideAfterClicked:true,
 		},
@@ -373,9 +437,9 @@ const beginNewDay = {
 			bg:`img/woods-camp.jpg`,
 		},
 	]
-}
+})
 
-const outsideTheInn = {
+outsideTheInn = {
 	intro:`In the center of town, your senses are assaulted with the sights, sounds and delectable smells of the Pudding Faire. A large banner above "Nanny Cowslip's Chariot of Consummate Confections" offers some direction. To your left, closer to the woods are the carnival games. To the right, stalls are open for casual shopping. Straight ahead, the Pudding Faire's main tent is a flurry of activity. As you consider your decision, a cart blazes through the center of town with a gnome atop it shouting, "THERE'S NO TIME LIKE THE PRESENT!" while he tosses handfuls of candy to nearby children.`,
 	return: `Back at the center of town, you consider your options. To the west, closer to the woods are the carnival games. To the east, stalls are open for casual shopping. To the north, the Pudding Faire's main tent is a flurry of activity. And, of course, there's Nanny Cowslip's chariot.`,
 	location:'center',
@@ -399,7 +463,11 @@ const outsideTheInn = {
 			button:`Head to the main tent`,
 			text:`The Great Pudding Tent seems particularly bustling — you head towards it to see what all the commotion is about.`,
 			duration:.5,
-			continue:5,
+			continue: () => {
+                if (timeOfDay < 12.5) {
+                    return 6
+                } else {return 7}
+            }
 		},
 		{
 			button:`Talk to Nanny Cowslip`,
@@ -479,7 +547,8 @@ const candyChariot = {
 		},
 	]
 }
-const carnivalArea = {
+
+carnivalArea = {
 	intro:`Gnomes and halfings young and old are raucously shouting all throughout the wooded games area. While the most puppet show happening just ahead of you is clearly the most popular attraction with a couple dozen children watching raptly, you quickly notice that most of the attending adults have flagons from the cider stand to your left. To your right you see a caricaturist drawing sketches for a few silver pieces each.`,
 	return: `You consider your options again — the puppet fair happening in the large tent, a quick visit to the cider stand, a sketch at the caricaturist, or heading back to the center of town.`,
 	eventBg: 'img/woods-fair.jpg',
@@ -494,14 +563,14 @@ const carnivalArea = {
 		{
 			button:`Approach the cider stand`,
 			text:`There's something alluring about the cider stand's colorful awnings that draws you in — besides, it's hot, and a cool cider sounds nice.`,
-			duration:0
-            //continue:1,
+			duration:0,
+            continue:8,
 		},
 		{
 			button:`Visit the caricaturist`,
 			text:`Looking over at the caricaturist, you can't help but notice that while the halfling is drawing caricatures of fairgoers, hung up around the stall are landscape paintings of local scenery.`,
-			duration:0
-			//continue:1,
+			duration:0,
+			continue:9,
 		},
 		{
 			button:`Watch the puppet show`,
@@ -597,16 +666,15 @@ const returnToInnAtNight = {
 			button:`Continue`,
 			text:`In the twilight of the day you make your way back to the inn, ready to put your head down for the night.`,
 			duration:0,
-			condition: goodDeeds < 5,
 			alreadyDisplayed:true,
 			continue:0,
-            bg:`img/town-night.jpg`
+            bg:`img/town-night.jpg`,
+            condition: () => goodDeeds < 4
 		},
 		{
 			button:`Greet Nanny Cowslip`,
 			text:`In the twilight of the day you make your way back to the inn, ready to put your head down for the night. Standing outside the inn, however, is Nanny Cowslip. As soon as she sees you she starts walking directly towards you.`,
 			duration:0,
-			condition: goodDeeds >= 5,
 			alreadyDisplayed:true,
             bg:`img/town-night.jpg`
 			//continue:0,
@@ -614,7 +682,7 @@ const returnToInnAtNight = {
 	]
 }
 
-const mainTent1 = {
+mainTent1 = {
 	intro:`As you approach the Great Pudding Tent you are surrounded by a flurry of activity. Gnomes and halflings are running across tables, racing towards the center tables. Onlookers are hurling food at them — mostly soft, squishy vegetables, like past-ripe tomatoes — and after you see a gnome reach the center table, his time is recorded on a nearby chalkboard.`,
 	eventBg: 'img/main-tent.jpg',
     location: "main tent",
@@ -641,7 +709,7 @@ const mainTent1 = {
 
 const mainTent2 = {
 	intro:`Stout tables and benches radiate around the Great Pudding: a fruitcake almost ten feet in diameter. People all around are talking about the feast in excited tones.`,
-	eventBg: '',
+	eventBg: 'img/main-tent.jpg',
 	options: [
 		{
 			button:`Return to the center of town`,
@@ -670,7 +738,7 @@ const mainTent2 = {
 
 const mainTent3 = {
 	intro:`Stout tables and benches radiate around the Great Pudding: a fruitcake almost ten feet in diameter. As you get closer, you see gnomes and halflings standing in worried knots, talking rapidly.`,
-	eventBg: '',
+	eventBg: 'img/main-tent.jpg',
 	options: [
 		{
 			button:`Return to the center of town`,
@@ -712,6 +780,118 @@ const mainTent3 = {
 	hiddenOptions: []
 }
 
+const ciderStall = {
+	intro:`The cider stand does a roaring trade in apple cider and berries from local presses. Patrons sit on wooden tables sheltered by wide, colorful awnings embroidered with smiling faces.`,
+	eventBg: 'img/cider-stall.jpeg',
+	options: [
+		{
+			button:`Look at what else there is to do`,
+			text:`You turn back to the games, and think about where to next.`,
+			duration:.5,
+			continue:3
+		},
+		{
+			button:`Chat up the bartender`,
+			text:`You try to chat with Maisie Plumtucker, but she's far too busy. She's serving cool cider on a hot day — idle chatter is for fairgoers, not busy workers.`,
+			duration:1,
+			//continue:0,
+			//bg:``,
+			//dailyConChanges:[],
+			//permConChanges:[],
+			//deed:``
+		},
+		{
+			button:`Ask for a wee dram`,
+			text:`You put your fingers close together and ask if you can have just a wee dram. You get the tiniest thimble of cider — just enough to let you get a sense of the flavor. Even with just a drop you can taste the freshness of the berries.`,
+			duration:.5,
+			//continue:0,
+			//bg:``,
+			//dailyConChanges:[],
+			//permConChanges:[],
+			//deed:``
+		},
+		{
+			button:`Buy a flagon`,
+			text:`You ask for a flagon and hand over two copper pieces. It's served quickly, and it's about the tastiest thing you can imagine.`,
+			duration:1,
+			//continue:0,
+			//bg:``,
+			//dailyConChanges:[],
+			//permConChanges:[],
+			//deed:``
+		},
+	],
+	hiddenOptions: [
+		{
+			button:`Buy a flagon... and chug it.`,
+			text:`You put down two copper pieces and ask for a flagon — the moment Maisie Plumtucker puts it down in front of you, you knock it back in one swallow. Everyone stares at you — half the crowd impressed, the other half appalled.`,
+			duration:1.5,
+			condition: dayCount > 2,
+			alreadyDisplayed:false,
+			//continue:0,
+			//bg:``,
+			//dailyConChanges:[],
+			//permConChanges:[],
+			//deed:``
+		},
+	]
+}
+const caricatureStall = {
+	intro:`As you get approach the caricature booth, it's obvious to you that the artist only dabbles in portraits — the real masterpieces are the landscape paintings that are displayed around the stall. `,
+	eventBg: 'img/caricature.jpeg',
+	options: [
+		{
+			button:`Wander away`,
+			text:`You decide you've spent enough time here for today and turn back to the rest of the carnival area.`,
+			duration:0,
+			continue:3,
+		},
+		{
+			button:`Examine the paintings`,
+			text:`Looking closer, the paintings are all of the surrounding area. You see bucolic pastorals of the fields and the majestic landscapes of Threepenny Wood. There's a mastery in the strokes — you feel like these paintings are at least on par with those you've seen on display in Waterdeep, Neverwinter and other major cities.`,
+			duration:1,
+		},
+	],
+	hiddenOptions: [
+		{
+			button:`Ask about purchasing a painting`,
+			text:`Feeling like these paintings are a real find, you ask Kohla Reedwright how much for a painting. When she says a gold piece, you consider buying them all — confident that you could sell them at a handsome profit in a larger city. Instead, you decide to purchase just one — a painting of the nearby lake.`,
+			duration:1,
+			condition: timeOfDay < 14,
+			alreadyDisplayed:true,
+			//continue:0,
+			//bg:``,
+			//dailyConChanges:[],
+			//permConChanges:[],
+			//deed:``
+		},
+		{
+			button:`Listen to the current subject`,
+			text:`"WHY WOULD YOU DRAW ME LIKE THAT?" an older gnome shouts at the caricature artist Kohla Reedwright. "DO YOU KNOW WHO I AM!? I'M BERTUS FLOPHOLLOW AND I WILL NOT STAND FOR THIS!" You look at the painting and see that Bertus' already small nose was drawn tiny, alongside exaggerating his chin. For a caricature, it's rather mild.`,
+			bg:"img/gnome-caricature.jpeg",
+            duration:1,
+			alreadyDisplayed:false,
+		},
+		{
+			button:`Try to calm to the current subject`,
+			text:`After a few minutes of trying to get a word in, you successfully divert the gnome's attention from the caricature towards other parts of the fair. When you look back at Kohla, she looks relieved.`,
+			duration:1,
+			alreadyDisplayed:false,
+			continue:3,
+			permConChanges:['knowHowToCalmCaric'],
+			deed:`good`
+		},
+		{
+			button:`Tell Kohla about Bertus`,
+			text:`Not wanting Kohla to be verbally assaulted by Bertus, you let her know that if he comes by he's likely to be angry — so it might be best to avoid exaggerating his nose and chin. She looks skeptical, but thanks you.`,
+			duration:1,
+			alreadyDisplayed:false,
+			continue:3,
+			dailyConChanges:['calmedBertus'],
+			deed:`good`
+		},
+	]
+}
 
 // I HATE HOW BOTH OF THESE WORK AND THERE SHOULD BE SOMETHING BETTER BUT I DON'T KNOW WHAT
 
@@ -723,8 +903,21 @@ const eventOptions = { // I'm setting this up to be called with bracket notation
     4: shopsArea,
     5: mainTent1,
     6: mainTent2,
-    7: mainTent3
+    7: mainTent3,
+    8: ciderStall,
+    9: caricatureStall
 }
+
+// const eventValues = Object.values(eventOptions)
+// console.log(eventValues)
+
+// const possibleEvents = []
+
+// eventValues.forEach((evt) => {
+//     possibleEvents.push(new FairEvents(evt.intro, evt.eventBg, evt.location, evt.options, evt.hiddenOptions, evt.return))
+// })
+
+// console.log(possibleEvents)
 
 const resetHiddenConditions = () => {
     beginNewDay.hiddenOptions[0].condition = dayCount >= 2,
@@ -740,7 +933,13 @@ const resetHiddenConditions = () => {
     shopsArea.hiddenOptions[0].condition = dayCount != 3,
     shopsArea.hiddenOptions[1].condition = dayCount === 3,
     mainTent1.hiddenOptions[0].condition = timeOfDay < 12.5,
-    mainTent1.hiddenOptions[1].condition = timeOfDay >= 12.5
+    mainTent1.hiddenOptions[1].condition = timeOfDay >= 12.5,
+    // returnToInnAtNight.hiddenOptions[0].condition = goodDeeds < 4,
+    returnToInnAtNight.hiddenOptions[1].condition = goodDeeds >= 4,
+    caricatureStall.hiddenOptions[0].condition = timeOfDay < 14,
+    caricatureStall.hiddenOptions[1].condition = timeOfDay >= 14 && dailyConditions.calmedBertus === false,
+    caricatureStall.hiddenOptions[2].condition = timeOfDay >= 14 && dailyConditions.calmedBertus === false,
+    caricatureStall.hiddenOptions[3].condition = timeOfDay < 13 && permConditions.knowHowToCalmCaric === true
 }
 
 // HIDDEN CONDITIONS THAT ARE USED BY EVENTS TO TRIGGER RESULTS
@@ -749,12 +948,14 @@ const resetHiddenConditions = () => {
 
 const dailyConditions = {
     "takenCandy": false,
-    "footprintsToWoods": false
+    "footprintsToWoods": false,
+    "calmedBertus":false
 }
 
 const permConditions = {
     "piedInFace":false,
-    "dodgedPie": false
+    "dodgedPie": false,
+    "knowHowToCalmCaric": false
 }
 
 const resetDailyConditions = () => {
@@ -797,4 +998,6 @@ Possible pitfalls:
 
 FUTURE
 - move the whole thing to humblewood, which could give it consistent art? or be fine with the varying styles or something.
+- whole thing top down maps? Something to create consistency of style. maybe faces and such are all official artwork?
+- make time of day visible or something.
 */
