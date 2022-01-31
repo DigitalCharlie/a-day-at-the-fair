@@ -426,6 +426,11 @@ const outsideTheInn = new FairEvent ({
 	returningIntro: `Back at the center of town, you consider your options. To the west, closer to the woods are the carnival games. To the east, stalls are open for casual shopping. To the north, the Pudding Faire's main tent is a flurry of activity. And, of course, there's Nanny Cowslip's chariot.`,
 	location:'center',
     eventBg: 'img/the-faire.png',
+	initialize: () => {
+		if (timeOfDay >= 12.5) {
+			currentText.lastElementChild.textContent += " You hear shouts of panic coming from the main tent area — it's hard to make it out from here, but you're pretty sure you hear the word 'frog.'"
+		}
+	},
 	options: [
 		{
 			button:`Go play some games`,
@@ -1230,13 +1235,13 @@ const edgeOfTheWoods = new FairEvent ({
 		let dayThreeText = `The woods seem overgrown, and difficult to traverse — and a couple of times you'd swear a squirrel looked at you like it wanted to take a bite.`
 		let dayFiveText = `You've always heard nice things about the Threepenny Wood, but there's a deep sense of dread oozing from it that makes you feel like turning back.`
 		if (dayCount === 1) {
-			baseText += dayOneText
+			baseText.textContent += dayOneText
 		} else if (dayCount === 2) {
-			baseText += dayTwoText
+			baseText.textContent += dayTwoText
 		} else if (dayCount === 3 || dayCount === 4) {
-			baseText += dayThreeText
+			baseText.textContent += dayThreeText
 		} else {
-			baseText += dayFiveText
+			baseText.textContent += dayFiveText
 		}
 	},
 	options: [
@@ -1248,16 +1253,115 @@ const edgeOfTheWoods = new FairEvent ({
 		},
 		{
 			button:`Keep following the gnomeish tracks`,
-			text:``,
+			text:`You head into the forest, focusing on following the smallest of the footprints you see. The path twists and turns through the woods, and you're sure a couple of times the trail loops back on itself. `,
 			duration:1.5,
 			condition: () => dailyConditions.footprintsToWoods === true
 		},
 		{
 			button:`Keep following the tallfolk's tracks`,
-			text:``,
+			text:`It's not terribly difficult for you to follow the tracks through the forest — there are at least 3 tallfolk, and they weren't walking single file so there's plenty of evidence of their passage.`,
 			duration:.5,
-			condition: () => dailyConditions.tallfolkTracks === true || dailyConditions.arabellaMissing === true
+			condition: () => dailyConditions.tallfolkTracks === true || dailyConditions.arabellaMissing === true,
+			buttonFunction: () => {
+				if (dailyConditions.arabellaMissing === true) {
+					currentText.lastElementChild.textContent += " It certainly doesn't hurt that it looks like they were dragging something with them."
+				}
+			},
+			continue:() => orcCamp
 		},
+	]
+})
+
+const orcCamp = new FairEvent ({
+	intro:`After an hour or so of tracking through the woods, you come upon the tallfolk's camp. It's relatively simple: a fire pit with a spit for roasting meat, a bivouac shelter, and some scattered bedrolls. With a few minutes' observation you can see that these tallfolk are of the orcish variety.`,
+	eventBg: 'img/orc-camp.jpeg',
+	options: [
+		{
+			button:`Head back to town`,
+			text:`There's something you don't like about going into the woods right now on your own — and you decide that you'd rather be back at the fair today.`,
+			duration:1.5,
+			continue:() => outsideTheInn,
+		},
+		{
+			button:`Sneak closer for a better look`,
+			text:`You move a dozen or so steps closer, and you start to make out the sounds of anguished moaning from the tent. `,
+			duration:.5,
+			buttonFunction: () => {
+				let baseText = currentText.lastElementChild
+				if (permConditions.slingTrapTriggered === true) {
+					baseText.textContent += `You deftly sidestep a few sling traps, knowing full well that's not an experience you want, and are able to overhear the conversation happening at the camp.`
+					changePermConditions(["slingTrapTriggered"])
+					continueButton(orcCamp)
+				} else {
+					baseText.textContent += `As you sneak a few paces forward, you suddenly feel yourself flipped wildly through the air and come to rest half a dozen feet off the ground, hanging upside down.`
+					changeDailyConditions(["closerToCamp"])
+					continueButton(caughtInSling)
+				}
+			},
+			condition: () => dailyConditions.closerToCamp === false,
+			dailyConChanges: ["closerToCamp"],
+			continue: () => orcCamp
+		},
+		{
+			button:`Stride out into the camp`,
+			text:`You start walking confidently out towards the center of the camp. `,
+			duration:.5,
+			buttonFunction: () => {
+				let baseText = currentText.lastElementChild
+				if (permConditions.slingTrapTriggered === true) {
+					baseText.textContent += `You deftly sidestep a few sling traps, knowing full well that's not an experience you want, and call out to Iork from the center of camp. He emerges from the tent with a confused look on his face.`
+					continueButton(orcCamp)
+				} else {
+					baseText.textContent += `As you walk a few paces forward, you suddenly feel yourself flipped wildly through the air and come to rest half a dozen feet off the ground, hanging upside down.`
+					changeDailyConditions(["closerToCamp"])
+					continueButton(caughtInSling)
+				}
+			},
+			condition: () => dailyConditions.closerToCamp === false,
+		},
+	]
+})
+
+const caughtInSling = new FairEvent ({
+	intro:`You hear whoops of delight coming from the camp as 3 orcs rush out towards you. The quickest of the bunch comes right up into your face and says, "Looks like we caught a little lurker, eh Iork? What shall we do with them — dinner? Food for Nik?" The largest of the bunch smiles is a deeply unsettling way.`,
+	eventBg:`img/orc-camp-upsidedown.jpeg`,
+	options: [
+		{
+			button:`Stay silent`,
+			text:`As Iork comes up and sniffs you, making all kinds of sickening comments about their plans to cook you, you stay quiet. That gets increasingly difficult as they poke and stab at you with knives and swords — the last thing you remember before blacking out from the pain is finally letting out a guttural scream of agony.`,
+			continue:() => beginNewDay
+		},
+		{
+			button: `Plead for mercy`,
+			text:`As Iork comes up and sniffs you, making all kinds of sickening comments about their plans to cook you, you beg for mercy. He looks at you straight in the face and says, "Sure. I'll grant you as much mercy as those adventurers gave Nik." You feel a sharp pain in your back and look up to see his spear embedded in your gut. "Let's see whether you last as long as he does. Who knows, maybe your agony will help him heal." The last thing you remember before blacking out is hearing your own moans of agony matched by those in the tent.`,
+			continue:() => beginNewDay
+		},
+		{
+			button: `Try to bargain`,
+			text:`Before Iork can do anything, you try to offer him a trade.`,
+			buttonFunction: () => {
+				let baseText = currentText.lastElementChild
+				if (adventurers[0].currentTrinket) {
+					baseText.textContent += ` "I have no need for a ` + adventurers[0].currentTrinket `."`
+				} 
+				if (adventurers[0].jokes.length != 0) {
+					baseText.textContent += ` "Your jokes are not amusing. This isn't a time for laughter."`
+				} 
+				if (dailyConditions.hasHealingPotion || dailyConditions.hasPotionOfPoison) {
+					if (dailyConditions.hasHealingPotion) {
+						let currentPotion = "healing potion"
+					} else {
+						let currentPotion = "potion of poison"
+					}
+					baseText.textContent += ` "As for this, well, this we'll just take," he says as he takes your ` + currentPotion + `.`
+				}
+				if (!adventurers[0].currentTrinket && adventurers[0].jokes.length === 0  && !(dailyConditions.hasHealingPotion || dailyConditions.hasPotionOfPoison)) {
+					baseText.textContent += ` "You have nothing we want."`
+				}
+				baseText.textContent += ` Iork then walks away, leaving his cronies to prepare you for the spit. The last thing you remember before blacking out is letting out a scream of agony.`
+			},
+			continue: () => beginNewDay
+		}
 	]
 })
 
@@ -1282,7 +1386,8 @@ const dailyConditions = {
     "helpedJanphar":false,
     "tallfolkTracks":false,
     "declinedEmery":false,
-    "savedEmery":false
+    "savedEmery":false,
+	"closerToCamp":false
 }
 
 const permConditions = {
@@ -1290,7 +1395,8 @@ const permConditions = {
     "dodgedPie": false,
     "knowHowToCalmCaric": false,
     "poppysRoutine":false,
-    "metEmery":false
+    "metEmery":false,
+	"slingTrapTriggered":false
 }
 
 const resetDailyConditions = () => { // for all the daily conditions, set them to false or 0, depending
