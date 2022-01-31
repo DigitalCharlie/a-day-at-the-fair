@@ -125,7 +125,8 @@ input[type="text"] {
 
 #current-text li {
     margin: 10px 0;
-    color:#6e6e6e
+    color:#6e6e6e;
+    transition: color .25s;
 }
 #current-text li:last-of-type {
     color:#fff;
@@ -141,6 +142,11 @@ button {
 
 .hidden-option, #history-button {
     transition: opacity 1.5s, background-color .25s;
+}
+
+.hidden-text {
+    transition:color 1.5s!important;
+    color: rgba(255,255,255,0)!important;
 }
 
 input, button {

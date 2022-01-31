@@ -104,6 +104,22 @@ const addToCurrentText = (text) => {
     currentText.scrollTop = currentText.scrollHeight
 }
 
+const delayAddToCurrentText = (text) => {
+	let newText = document.createElement('li') // create a new list item
+	newText.textContent = text // make the text of the new list item equal to whatever the input text is
+	let newHistoryText = newText.cloneNode(true)
+	// newText.style.color = "rgba(255,255,255,0)"
+	newText.classList.add("hidden-text")
+	historyContents.lastElementChild.appendChild(newHistoryText) // adds it to the history as well
+	currentText.scrollTop = currentText.scrollHeight
+	setTimeout(()=> {
+		currentText.appendChild(newText) // adds it to the UL that holds text
+	},1000) // after 1s, then set the opacity of the hidden li to 1.
+	setTimeout(()=> {
+		newText.classList.remove("hidden-text")
+	},1100) // after 1s, then set the opacity of the hidden li to 1.
+}
+
 const continueButton = (eventName) => {
     clearButtons() // gets rid of all the current buttons
     const newBtn = document.createElement('button') // creates a new button
@@ -184,7 +200,9 @@ const createOptionButtons = (eventName) => {
             newBtn.textContent = option.button // make the name of the button
             newBtn.addEventListener('click', ()=>{ // Single event listener which has all the stuff below
                 addToCurrentText(option.text)
-                advanceTime(option.duration)
+				if (option.duration) {
+					advanceTime(option.duration)
+				}
                 const continueTo = typeof option.continue === 'function' ? option.continue() : option.continue // use a ternary so whether the continue part is a function or not, it's handled.
                 if (continueTo) { // checks if there is a continue location — if yes, display it.
                    continueButton(continueTo)  // makes it so clicking the button adds an appropriate continue button
@@ -428,7 +446,7 @@ const outsideTheInn = new FairEvent ({
     eventBg: 'img/the-faire.png',
 	initialize: () => {
 		if (timeOfDay >= 12.5) {
-			currentText.lastElementChild.textContent += " You hear shouts of panic coming from the main tent area — it's hard to make it out from here, but you're pretty sure you hear the word 'frog.'"
+			delayAddToCurrentText("You hear shouts of panic coming from the main tent area — it's hard to make it out from here, but you're pretty sure you hear the word 'frog.'")
 		}
 	},
 	options: [
@@ -553,13 +571,12 @@ const carnivalArea = new FairEvent ({
 	location:'carnival',
     initialize: () => {
         if (timeOfDay >= 12 && timeOfDay <= 14 && dailyConditions.piedToday === false) {
-            let lastText = currentText.lastElementChild
             let firstInitText = " As you consider your options, a custard tart comes flying at you and catches you on the side of the face."
             let laterInitText = " As you consider your options, a familiar custard tart comes flying at you."
             if (permConditions.piedInFace === true) {
-                lastText.textContent += laterInitText
+                delayAddToCurrentText(laterInitText)
             } else {
-                lastText.textContent += firstInitText
+                delayAddToCurrentText(firstInitText)
             }
             dailyConditions.piedToday = true
         }
@@ -623,10 +640,10 @@ const shopsArea = new FairEvent ({
 	location: 'shops',
     initialize: () => {
         if (dayCount === 3) {
-            currentText.lastElementChild.textContent += " But something is different today — there's no crowd by Janphar's stall. He's just sitting there crying."
+            delayAddToCurrentText("Something is different today — there's no crowd by Janphar's stall. He's just sitting there crying.")
         }
         if (dayCount === 4) {
-            currentText.lastElementChild.textContent += " Wait — where's Arabella? The herbalist's wagon is missing."
+            delayAddToCurrentText("Wait — where's Arabella? The herbalist's wagon is missing.")
         }
     },
 	options: [
@@ -681,7 +698,7 @@ const returnToInnAtNight = new FairEvent ({
 	eventBg: '',
     initialize: () => {
         if (goodDeeds >= 3) {
-            currentText.lastElementChild.textContent += " As you make your way back, you see Nanny Cowslip's stand is still open. "
+            delayAddToCurrentText(" As you make your way back, you see Nanny Cowslip's stand is still open.")
         }
     },	options: [
 		{
@@ -1007,9 +1024,8 @@ const herbalist = new FairEvent ({
 			stickFigureText = `You notice one other carving - a creepy, stick-thin horned figure about ` + dayCount * 2 + ` hand-lengths from the back of the wagon.`
             lastText.textContent += stickFigureText
 		}
-		if (timeOfDay >= 10 && timeOfDay < 11 && dailyConditions.helpedJosie === false) {
-            let newText = ` Suddenly, the tabaxi whirls around and picks up a child by the wrist. "Oh no you don't!" she says. Then she shouts loudly for the fairground overseers, asking them to come deal with the young thief.`
-            lastText.textContent += newText
+		if (timeOfDay >= 10 && timeOfDay < 12 && dailyConditions.helpedJosie === false && dailyConditions.pickupPotion === false) {
+            delayAddToCurrentText(`Suddenly, the tabaxi whirls around and picks up a child by the wrist. "Oh no you don't!" she says. Then she shouts loudly for the fairground overseers, asking them to come deal with the young thief.`)
 		}
         if (dailyConditions.pickupPotion === true) {
             addToCurrentText(`You pick up a red vial and look at how beautifully it shimmers. As you eye it, Arabella chimes in, "Oh! That's the potion of posion. It's made to look just like a healing potion, sorry, this is the one you want."`)
@@ -1020,6 +1036,7 @@ const herbalist = new FairEvent ({
 			button:`Look at other shops`,
 			text:`You've had enough of potions for the day and turn away from the stall.`,
 			continue: () => shopsArea,
+			duration:.5,
 		},
 		{
 			button:`Buy a healing potion`,
@@ -1059,7 +1076,7 @@ const herbalist = new FairEvent ({
 		{
 			button:`Listen to the child's pleas`, // this is a test of embedding events inside of other events. it's probably less good than just separate events.
 			text: `You move closer to hear the child over Arabella's calls for the guards.`,
-			condition: () => timeOfDay >= 10 && timeOfDay < 12 && dailyConditions.helpedJosie === false,
+			condition: () => timeOfDay >= 10 && timeOfDay < 12 && dailyConditions.helpedJosie === false && dailyConditions.pickupPotion === false,
 			permConChanges:["stingingNettle"],
             continue: () => herbalist.options[5],
             alreadyDisplayed: false,
@@ -1085,7 +1102,7 @@ const herbalist = new FairEvent ({
 		{
 			button:`Wait for the guards`,
 			text: `You stand by as the guards eventually come — it takes a few minutes, but when they finally arrive, they quickly take the child away.`,
-			condition: () => timeOfDay >= 10 && timeOfDay < 11 && dailyConditions.helpedJosie === false,
+			condition: () => timeOfDay >= 10 && timeOfDay < 12 && dailyConditions.helpedJosie === false && dailyConditions.pickupPotion === false,
 			duration:2,
             alreadyDisplayed: false,
 		}
@@ -1166,7 +1183,6 @@ const postPuppetShow = new FairEvent ({
 	intro:`Towards the end of the show, you can tell that something is bothering Emery — he's only operating the moving parts of the puppets on the right side of the stage. The children barely seem to notice, applauding wildly at the end, but the longer the show went on the clearer the difference between the left and right became.`,
 	eventBg: 'img/puppet-show.jpeg',
 	initialize: () => {
-		console.log('test')
 		if (dailyConditions.savedEmery === true) {
 			currentText.lastElementChild.textContent = `You applaud loudly — watching Emery perform with both his hands working is truly a thing of magic. He was impressive before, but this was on an entirely different level.`
 		} else {
