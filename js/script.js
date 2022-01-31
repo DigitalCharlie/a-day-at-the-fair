@@ -108,7 +108,7 @@ const continueButton = (eventName) => {
     clearButtons() // gets rid of all the current buttons
     const newBtn = document.createElement('button') // creates a new button
     newBtn.textContent = "Continue" // makes it so the text of the new button is continue 
-    if (eventName != (beginNewDay || returnToInnAtNight || caughtInSling || orcCamp) && timeOfDay >= 16) {
+    if (eventName != (beginNewDay || returnToInnAtNight || caughtInSling || orcCamp) && timeOfDay >= 17) {
         returnToInnBg()
         newBtn.addEventListener('click', ()=>{newEvent(returnToInnAtNight)})
     } else {
@@ -412,7 +412,7 @@ const beginNewDay = new FairEvent ({
 			button:`Flee town`,
 			text:`Deciding that this place is decidedly weird, you figure that making a run for it is at least worth a shot. You pack up your things and head away from the town. Fortunately, the next town isn't more than a day's journey, and you'll only need to camp one night. As you lay your head down your say a prayer that the next thing you hear won't be the sound of the fair again.`,
 			duration:13,
-			condition: () => dayCount > 3,
+			condition: () => dayCount > 4,
 			alreadyDisplayed: false,
 			continue: () => beginNewDay,
 			hideAfterClicked: true,
@@ -463,7 +463,7 @@ const outsideTheInn = new FairEvent ({
 		{
 			button:`Chase the cart`,
 			text:`Remembering that the puppeteer Emery Plumwicket had his hand run over by a cart, you chase down the gnome throwing candy and tell him to be careful — you heard someone was hit by a speeding cart earlier and don't want it to happen again.`,
-			duration:1,
+			duration:.5,
 			condition: () => permConditions.metEmery === true && timeOfDay < 8.5,
 			alreadyDisplayed:false,
 			dailyConChanges:["savedEmery"],
@@ -512,7 +512,7 @@ const candyChariot = new FairEvent ({
 		{
 			button:`Ask what's in the candy`,
 			text:`When you ask what's in the candy, she looks taken aback. After a few moments she leans in close and says, "Pure magic." You can't quite tell if she's being serious.`,
-			duration:.5,
+			duration:0,
 		},
         {
 			button:`Head away from the cart`,
@@ -593,7 +593,7 @@ const carnivalArea = new FairEvent ({
 			button:`Look for the culprit`,
 			text:`After looking around for a moment, you see the culprit: a giggling gnome child who darts away as soon as you make eye contact. Your emotions calm after a minute and you're just thankful it's not a mimic this time. Gods, last week was rough.`,
 			duration:.5,
-			condition: () => timeOfDay >= 12 && timeOfDay <= 14 && dailyConditions.piedToday === false,
+			condition: () => timeOfDay >= 12 && timeOfDay <= 14 && dailyConditions.piedToday === false && permConditions.piedInFace === false,
 			alreadyDisplayed:false,
 			permConChanges:["piedInFace"]
 		},
@@ -639,28 +639,28 @@ const shopsArea = new FairEvent ({
 		{
 			button:`Visit the herbalist`,
 			text:`The herbalist's stall isn't terribly busy as you approach — which gives you a clear view of the woodland animals carved into the wood of the stall.`,
-			duration:1.5,
+			duration:0,
 			continue: () => herbalist,
             condition: () => dayCount != 4 && dailyConditions.hasHealingPotion === false && dailyConditions.hasPotionOfPoison === false
 		},
 		{
 			button:`Check out the yard sale`,
 			text:`As you head towards the yard sale, it's clear why this takes up so much space: every item is laid out on blankets, with dozens of trinkets priced to move.`,
-			duration:1.5,
+			duration:0,
 			continue: () => yardSale,
             condition: () => dailyConditions.purchasedTrinket === false
 		},
 		{
 			button:`Browse the pottery`,
 			text:`The small stall next to the kiln is clearly the busiest stall in the area — as you approach, you see a dozen or so families all holding similar commemorative plates.`,
-			duration:1.5,
+			duration:0,
             continue:() => pottersKiln,
             condition: () => dayCount != 3 && dailyConditions.boughtPlate === false,
 		},
 		{
 			button:`Approach the distressed potter`,
 			text:`You walk towards Janphar, who sits sobbing with his head in his hands. Every other day there has been a crowd surrounding his stall — but not today.`,
-			duration:1.5,
+			duration:0,
 			alreadyDisplayed:false,
             condition: () => dayCount === 3 && dailyConditions.helpedJanphar === false,
             continue:() => brokenKiln
@@ -711,7 +711,7 @@ const mainTentMorning = new FairEvent ({
 		{
 			button:`Return to the center of town`,
 			text:`Deciding you'be seen enough of the Great Pudding Tent, you head back to the center of town.`,
-			duration:.5,
+			duration:0,
 			continue: () => outsideTheInn
 		},
 		{
@@ -740,24 +740,24 @@ const mainTentAfternoon = new FairEvent ({
 		{
 			button:`Return to the center of town`,
 			text:`Deciding don't want anything to do with what has happened here, you head back to the center of town.`,
-			duration:.5,
+			duration:0,
 			continue: () => outsideTheInn,
         },
 		{
 			button:`Ask what happened`,
 			text:`You ask a few people what happened, but the clearest explanation comes from a child who spits out the tale rapidly. "The mayor told this guy who talked bad that he needed to go and then the guy said NO and then there was this big sound and now LOOK the mayor's wife is holding on to that toad BUT THE TOAD IS THE MAYOR hehehehehe our mayor croaked but he's still alive hahahaha.`,
-			duration:0,
+			duration:.5,
 		},
 		{
 			button:`Try to eavesdrop`,
 			text:`You move around the crowd, trying to hear what's happened. "Can you believe the mayor got turned into a FROG?! It's just awful!" says one gnome. "That drunk dude blew some green powder in his face, then poof! Frog. See, I told you no good comes from folks who prefer to sleep in Threepenny Wood." replies another. Moving around, you gather that Mayor Barleydew asked the gnome to leave because he was disturbing the locals with his creepy talk and bad attitude.`,
-			duration:0,
+			duration:.5,
 			dailyConChanges:['footprintsToWoods'],
 		},
 		{
 			button:`Do a little investigating`,
 			text:`Deciding to poke around a bit, you're having trouble telling footprints apart — there are a lot of people milling around — but as you head back towards the center of town, you notice some deeper footprints leading to Threepenny Wood. Looks like someone put a lot of force into their step.`,
-			duration:0,
+			duration:1,
 			continue: () => outsideTheInn,
 			dailyConChanges:['footprintsToWoods'],
 		},
@@ -772,12 +772,12 @@ const ciderStall = new FairEvent ({
 		{
 			button:`Look at what else there is to do`,
 			text:`You turn back to the games, and think about where to next.`,
-			duration:.5,
+			duration:0,
 			continue: () => carnivalArea
 		},
 		{
 			button:`Chat up the bartender`,
-			text:`You try to chat with Maisie Plumtucker, but she's far too busy. She's serving cool cider on a hot day — idle chatter is for fairgoers, not busy workers.`,
+			text:`You try to chat with Maisie Plumtucker, but she's far too busy. She tells you to cut it out — she's serving cool cider on a hot day. Idle chatter is for fairgoers, not busy workers. `,
 			duration:1,
 		},
 		{
@@ -826,7 +826,7 @@ const caricatureStall = new FairEvent ({
 			button:`Listen to the current subject`,
 			text:`"WHY WOULD YOU DRAW ME LIKE THAT?" an older gnome shouts at the caricature artist Kohla Reedwright. "DO YOU KNOW WHO I AM!? I'M BERTUS FLOPHOLLOW AND I WILL NOT STAND FOR THIS!" You look at the painting and see that Bertus' already small nose was drawn tiny, alongside exaggerating his chin. For a caricature, it's rather mild.`,
 			bg:"img/gnome-caricature.jpeg",
-            duration:1,
+            duration:.5,
 			alreadyDisplayed:false,
             condition: () => timeOfDay >= 14 && dailyConditions.calmedBertus === false,
 		},
@@ -931,7 +931,7 @@ const daytimeInn = new FairEvent ({
 			button:`Sit at the table in the corner`,
 			text:`You don't always want to brood in a corner, but today it seems really, deeply appealing. Plus, there's table service which makes it easier to keep on drinking.`,
             bg:'img/corner-table.jpeg',
-			duration:1,
+			duration:.5,
 		},
 		{
 			button:`Toss a coin to the jester`,
@@ -979,8 +979,7 @@ const standUpComedy = new FairEvent ({
                     if (dailyConditions.improvedRoutine === true && dailyConditions.jokeCount === 4) {
                         dailyConditions.jokeCount++
                     } 
-                    addToCurrentText(allJokes[dailyConditions.jokeCount])
-                    timeOfDay += .34
+					addToCurrentText(allJokes[dailyConditions.jokeCount])
                 } else {
                     if (dailyConditions.improvedRoutine === true) {
                         addToCurrentText(`Poppy takes a deep bow and basks in your applause — and with the claps from behind you combined with Poppy's reaction, this is clearly the best her set has ever been received. You turn back to the rest of the inn.`)
@@ -993,7 +992,8 @@ const standUpComedy = new FairEvent ({
                 }
             },
             repeatable: true,
-            dailyConChanges: ["jokeCount"]
+            dailyConChanges: ["jokeCount"],
+			duration: .25
         }
     ]
 })
@@ -1019,7 +1019,6 @@ const herbalist = new FairEvent ({
 		{
 			button:`Look at other shops`,
 			text:`You've had enough of potions for the day and turn away from the stall.`,
-			duration:.5,
 			continue: () => shopsArea,
 		},
 		{
@@ -1044,7 +1043,6 @@ const herbalist = new FairEvent ({
 		{
 			button:`Buy the healing potion`,
 			text:`You think about it for a minute, but decide a healing potion is actually what you need.`,
-			duration:.5,
 			condition: () => dailyConditions.pickupPotion === true,
 			alreadyDisplayed:false,
 			dailyConChanges:["hasHealingPotion"],
@@ -1053,7 +1051,6 @@ const herbalist = new FairEvent ({
 		{
 			button:`Buy the potion of poison`,
 			text:`You smile when she reaches out for the vial and pull it away. Instead, you give her a few gold pieces. She starts to say something, but stops, nods at you, and gives an exaggerated wink.`,
-			duration:.5,
 			condition: () => dailyConditions.pickupPotion === true,
 			alreadyDisplayed:false,
 			dailyConChanges:["hasPotionOfPoison"],
@@ -1062,7 +1059,7 @@ const herbalist = new FairEvent ({
 		{
 			button:`Listen to the child's pleas`, // this is a test of embedding events inside of other events. it's probably less good than just separate events.
 			text: `You move closer to hear the child over Arabella's calls for the guards.`,
-			condition: () => timeOfDay >= 10 && timeOfDay < 11 && dailyConditions.helpedJosie === false,
+			condition: () => timeOfDay >= 10 && timeOfDay < 12 && dailyConditions.helpedJosie === false,
 			permConChanges:["stingingNettle"],
             continue: () => herbalist.options[5],
             alreadyDisplayed: false,
@@ -1089,7 +1086,7 @@ const herbalist = new FairEvent ({
 			button:`Wait for the guards`,
 			text: `You stand by as the guards eventually come — it takes a few minutes, but when they finally arrive, they quickly take the child away.`,
 			condition: () => timeOfDay >= 10 && timeOfDay < 11 && dailyConditions.helpedJosie === false,
-			duration:1,
+			duration:2,
             alreadyDisplayed: false,
 		}
 
@@ -1168,13 +1165,13 @@ const puppetShow = new FairEvent ({
 const postPuppetShow = new FairEvent ({
 	intro:`Towards the end of the show, you can tell that something is bothering Emery — he's only operating the moving parts of the puppets on the right side of the stage. The children barely seem to notice, applauding wildly at the end, but the longer the show went on the clearer the difference between the left and right became.`,
 	eventBg: 'img/puppet-show.jpeg',
-	initalize: () => {
+	initialize: () => {
+		console.log('test')
 		if (dailyConditions.savedEmery === true) {
 			currentText.lastElementChild.textContent = `You applaud loudly — watching Emery perform with both his hands working is truly a thing of magic. He was impressive before, but this was on an entirely different level.`
 		} else {
 			currentText.lastElementChild.textContent = `Towards the end of the show, you can tell that something is bothering Emery — he's only operating the moving parts of the puppets on the right side of the stage. The children barely seem to notice, applauding wildly at the end, but the longer the show went on the clearer the difference between the left and right became.`
 		}
-
 	},
 	options: [
 		{
@@ -1217,7 +1214,7 @@ const talkingToEmery = new FairEvent ({
 		{
 			button:`Volunteer to help`,
 			text:`You think for a few moments, and then decide you have nothing better to do. Emery gives you a quick crash course on puppeteering and gives you some tips on storytelling. It's smooth sailing all day, and while it's exhausting, it's also delightful seeing the kids get so much joy out of all your performances.`,
-			duration:8,
+			duration:12,
 			continue:() => carnivalArea,
 			permConChanges: ["metEmery"],
 			deed:"good"
@@ -1293,7 +1290,6 @@ const orcCamp = new FairEvent ({
 		{
 			button:`Sneak closer for a better look`,
 			text:`You move a dozen or so steps closer, and you start to make out the sounds of anguished moaning from the tent. `,
-			duration:.5,
 			buttonFunction: () => {
 				let baseText = currentText.lastElementChild
 				if (permConditions.slingTrapTriggered === true) {
@@ -1308,18 +1304,16 @@ const orcCamp = new FairEvent ({
 			},
 			condition: () => dailyConditions.closerToCamp === false,
 			dailyConChanges: ["closerToCamp"],
-			continue: () => orcCamp
 		},
 		{
 			button:`Stride out into the camp`,
 			text:`You start walking confidently out towards the center of the camp. `,
-			duration:.5,
 			buttonFunction: () => {
 				let baseText = currentText.lastElementChild
 				if (permConditions.slingTrapTriggered === true) {
 					baseText.textContent += `You deftly sidestep a few sling traps, knowing full well that's not an experience you want, and call out to Iork from the center of camp. He emerges from the tent with a confused look on his face.`
 					changeDailyConditions(["closerToCamp"])
-					continueButton(orcCamp)
+					continueButton(inTheCamp)
 				} else {
 					baseText.textContent += `As you walk a few paces forward, you suddenly feel yourself flipped wildly through the air and come to rest half a dozen feet off the ground, hanging upside down.`
 					changePermConditions(["slingTrapTriggered"])
@@ -1430,31 +1424,3 @@ document.documentElement.style.setProperty('--vh', `${vh}px`);
 // STUFF AT THE END
 
 buttonColorIsRandom()
-
-
-
-/* 
-MAIN GAME
-Something to add new text to the current box
-Something to add new text to the history box
-Something to show/hide the history box (which is.... either on the side or a pop up?)
-Something to clear the current box
-Something to track good deeds
-Something to branch and track decisions
-Classes for NPCs --> so they're random the first time, then exist.
-Arrays for dialogue for non-looped NPCs
-
-
-STRETCH
-Settings, including toggling the opacity of the text section BG
-Close up of characters --> when talking to people?
-
-Possible pitfalls:
-- will have some slightly redundant events that will serve as continuations — need to do something for after they select a few options how buttons may change.
-    - ex: can they pick all the options in the room before having to continue? Or after a couple does it force forwards (if possible)?
-
-FUTURE
-- move the whole thing to humblewood, which could give it consistent art? or be fine with the varying styles or something.
-- whole thing top down maps? Something to create consistency of style. maybe faces and such are all official artwork?
-- make time of day visible or something.
-*/
