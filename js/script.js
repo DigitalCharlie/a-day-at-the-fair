@@ -108,7 +108,7 @@ const continueButton = (eventName) => {
     clearButtons() // gets rid of all the current buttons
     const newBtn = document.createElement('button') // creates a new button
     newBtn.textContent = "Continue" // makes it so the text of the new button is continue 
-    if (eventName != (beginNewDay || returnToInnAtNight) && timeOfDay >= 16) {
+    if (eventName != (beginNewDay || returnToInnAtNight || caughtInSling || orcCamp) && timeOfDay >= 16) {
         returnToInnBg()
         newBtn.addEventListener('click', ()=>{newEvent(returnToInnAtNight)})
     } else {
@@ -491,6 +491,14 @@ const outsideTheInn = new FairEvent ({
 			duration:1,
 			alreadyDisplayed:false,
             condition: () => dailyConditions.tallfolkTracks === true,
+			continue: () => edgeOfTheWoods
+		},
+		{
+			button:`Head back to the Threepenny Wood`,
+			text:`You decide that whatever's happening in the wood is more important than the fair.`,
+			duration:1,
+			alreadyDisplayed:false,
+            condition: () => permConditions.slingTrapTriggered === true,
 			continue: () => edgeOfTheWoods
 		},
 	]
@@ -1290,11 +1298,11 @@ const orcCamp = new FairEvent ({
 				let baseText = currentText.lastElementChild
 				if (permConditions.slingTrapTriggered === true) {
 					baseText.textContent += `You deftly sidestep a few sling traps, knowing full well that's not an experience you want, and are able to overhear the conversation happening at the camp.`
-					changePermConditions(["slingTrapTriggered"])
+					changeDailyConditions(["closerToCamp"])
 					continueButton(orcCamp)
 				} else {
 					baseText.textContent += `As you sneak a few paces forward, you suddenly feel yourself flipped wildly through the air and come to rest half a dozen feet off the ground, hanging upside down.`
-					changeDailyConditions(["closerToCamp"])
+					changePermConditions(["slingTrapTriggered"])
 					continueButton(caughtInSling)
 				}
 			},
@@ -1310,10 +1318,11 @@ const orcCamp = new FairEvent ({
 				let baseText = currentText.lastElementChild
 				if (permConditions.slingTrapTriggered === true) {
 					baseText.textContent += `You deftly sidestep a few sling traps, knowing full well that's not an experience you want, and call out to Iork from the center of camp. He emerges from the tent with a confused look on his face.`
+					changeDailyConditions(["closerToCamp"])
 					continueButton(orcCamp)
 				} else {
 					baseText.textContent += `As you walk a few paces forward, you suddenly feel yourself flipped wildly through the air and come to rest half a dozen feet off the ground, hanging upside down.`
-					changeDailyConditions(["closerToCamp"])
+					changePermConditions(["slingTrapTriggered"])
 					continueButton(caughtInSling)
 				}
 			},
