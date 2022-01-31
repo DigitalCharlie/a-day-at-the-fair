@@ -20,7 +20,7 @@ const bg = document.getElementById('bg')
 // VARIABLES THAT STRUCTURE THE GAME PLAY
 // should have wrapped it inside of game objects, but I did not.
 
-let dayCount = 3
+let dayCount = 4
 let goodDeeds = 0
 let badDeeds = 0
 let timeOfDay = 7
@@ -537,7 +537,7 @@ const carnivalArea = new FairEvent ({
 	location:'carnival',
     initialize: () => {
         if (timeOfDay >= 12 && timeOfDay <= 14 && dailyConditions.piedToday === false) {
-            let lastText = document.getElementById('current-text').lastElementChild
+            let lastText = currentText.lastElementChild
             let firstInitText = " As you consider your options, a custard tart comes flying at you and catches you on the side of the face."
             let laterInitText = " As you consider your options, a familiar custard tart comes flying at you."
             if (permConditions.piedInFace === true) {
@@ -621,8 +621,7 @@ const shopsArea = new FairEvent ({
 			button:`Visit the herbalist`,
 			text:`The herbalist's stall isn't terribly busy as you approach — which gives you a clear view of the woodland animals carved into the wood of the stall.`,
 			duration:1.5,
-			//continue:0,
-			bg:`img/herbalist.jpeg`,
+			continue: () => herbalist,
             condition: () => dayCount != 4
 		},
 		{
@@ -630,7 +629,6 @@ const shopsArea = new FairEvent ({
 			text:`As you head towards the yard sale, it's clear why this takes up so much space: every item is laid out on blankets, with dozens of trinkets priced to move.`,
 			duration:1.5,
 			continue: () => yardSale,
-			bg:`img/trinkets.jpeg`,
             condition: () => dailyConditions.purchasedTrinket === false
 		},
 		{
@@ -639,7 +637,6 @@ const shopsArea = new FairEvent ({
 			duration:1.5,
 			alreadyDisplayed:true,
             condition: () => dayCount != 3,
-			bg:`img/potter.jpeg`,
 		},
 		{
 			button:`Approach the distressed potter`,
@@ -647,7 +644,6 @@ const shopsArea = new FairEvent ({
 			duration:1.5,
 			alreadyDisplayed:false,
             condition: () => dayCount === 3,
-			bg:`img/potter.jpeg`,
 		},
         {
             button: `Ask around about Arabella`,
@@ -838,7 +834,7 @@ const caricatureStall = new FairEvent ({
 
 const yardSale = new FairEvent ({
 	intro:`Gaffer Hogwaddle’s orchard backs onto the village green, so every year he holds a yard sale at the Pudding Faire to clear out any bric-a-brac he’s accumulated. There are hundreds of items laid out, but a few catch your eye today. Which one do you want to purchase?`,
-	eventBg: '',
+	eventBg: 'img/trinkets.jpeg',
 	options: [
 		{
 			button:`None of them`,
@@ -986,6 +982,102 @@ const standUpComedy = new FairEvent ({
     ]
 })
 
+const herbalist = new FairEvent ({
+	intro:`The tabaxi herbalist Arabella Dent waves at you as you approach and asks, "Here for a healing potion? Or perhaps a balm to ward off the sun? You fleshy folk do seem to need it." As you get closer, you can make out a number of animals carved into the wagon — a few deer, some squirrels and a badgermole figure most prominently.`,
+	eventBg: 'img/herbalist.jpeg',
+	initialize: () => {
+        let lastText = currentText.lastElementChild
+		if (dayCount > 2) {
+			stickFigureText = `You notice one other carving - a creepy, stick-thin horned figure about ` + dayCount * 2 + ` hand-lengths from the back of the wagon.`
+            lastText.textContent += stickFigureText
+		}
+		if (timeOfDay >= 10 && timeOfDay < 11 && dailyConditions.helpedJosie === false) {
+            let newText = ` Suddenly, the tabaxi whirls around and picks up a child by the wrist. "Oh no you don't!" she says. Then she shouts loudly for the fairground overseers, asking them to come deal with the young thief.`
+            lastText.textContent += newText
+		}
+        if (dailyConditions.pickupPotion === true) {
+            addToCurrentText(`You pick up a red vial and look at how beautifully it shimmers. As you eye it, Arabella chimes in, "Oh! That's the potion of posion. It's made to look just like a healing potion, sorry, this is the one you want."`)
+        }
+	},
+	options: [
+		{
+			button:`Look at other shops`,
+			text:`You've had enough of potions for the day and turn away from the stall.`,
+			duration:.5,
+			continue: () => shopsArea,
+		},
+		{
+			button:`Buy a healing potion`,
+			text:`You pick up a red vial and look at how beautifully it shimmers. As you eye it, Arabella chimes in, "Oh! That's the potion of posion. It's made to look just like a healing potion, sorry, this is the one you want."`,
+			duration:.5,
+			condition: () => dailyConditions.pickupPotion === false && dailyConditions.hasHealingPotion === false && dailyConditions.hasPotionOfPoison === false,
+			buttonFunction: () => {
+				newEvent(herbalist)
+			},
+			dailyConChanges:["pickupPotion"],
+		},
+		{
+			button:`Buy a some anti-sun balm`,
+			text:`You realize you are rather pale and think that perhaps some of the anti-sun balm might actually help. When you apply some on your nose it gives a distinct cooling effect and makes you feel more alert.`,
+			duration:.5,
+			continue: () => shopsArea,
+			condition: () => dailyConditions.purchasedBalm === false,
+			buttonFunction: () => timeOfDay-2,
+			dailyConChanges:["purchasedBalm"],
+		},
+		{
+			button:`Buy the healing potion`,
+			text:`You think about it for a minute, but decide a healing potion is actually what you need.`,
+			duration:.5,
+			condition: () => dailyConditions.pickupPotion === true,
+			alreadyDisplayed:false,
+			dailyConChanges:["hasHealingPotion"],
+            continue: () => shopsArea
+		},
+		{
+			button:`Buy the potion of poison`,
+			text:`You smile when she reaches out for the vial and pull it away. Instead, you give her a few gold pieces. She starts to say something, but stops, nods at you, and gives an exaggerated wink.`,
+			duration:.5,
+			condition: () => dailyConditions.pickupPotion === true,
+			alreadyDisplayed:false,
+			dailyConChanges:["hasPotionOfPoison"],
+            continue: () => shopsArea
+		},
+		{
+			button:`Listen to the child's pleas`,
+			text: `You move closer to hear the child over Arabella's calls for the guards.`,
+			condition: () => timeOfDay >= 10 && timeOfDay < 11 && dailyConditions.helpedJosie === false,
+			permConChanges:["stingingNettle"],
+            continue: () => herbalist.options[5],
+            intro: `She whimpers something about a stinging nettle rash, and when you look down you see her leg is covered in a harsh looking scaly redness. When you inquire about it, she says it happened when she was picking mushrooms in the woods that morning.`,
+			options: [
+				{
+					button:`Offer to buy the balm`,
+					text:`When you offer up a gold to Arabella on behalf of the child she rolls her eyes and says, "And your kind think our coats are soft. Well fine, coin is coin. Anything else?"`,
+					duration:.5,
+					continue: () => herbalist,
+					dailyConChanges:["helpedJosie"],
+                    deed: "good"
+				},
+				{
+					button:`Admonish Josie`,
+					text:`You tell Josie that stealing is wrong and she needs to suffer the consequences of her actions. You go back to browsing the potions.`,
+					duration:.5,
+					continue: () => herbalist,
+					dailyConChanges:["helpedJosie"],
+				}
+			]
+		},
+		{
+			button:`Wait for the guards`,
+			text: `You stand by as the guards eventually come — it takes a few minutes, but when they finally arrive, they quickly take the child away.`,
+			condition: () => timeOfDay >= 10 && timeOfDay < 11 && dailyConditions.helpedJosie === false,
+			duration:1
+		}
+
+	]
+})
+
 // LIST OF CONDITIONS, MOSTLY FOR REFERENCE SINCE THEY DON'T NEE TO EXIST UNTIL I CREATE THEM.
 
 const dailyConditions = {
@@ -997,7 +1089,12 @@ const dailyConditions = {
     "beersToday": 0,
     "jokeCount": 0,
     "improvedRoutine": false,
-    "arabellaMissing":false
+    "arabellaMissing":false,
+    "hasHealingPotion": false,
+    "hasPotionOfPoison": false,
+    "purchasedBalm": false,
+    "pickupPotion": false,
+    "helpedJosie": false
 }
 
 const permConditions = {
