@@ -20,7 +20,7 @@ const bg = document.getElementById('bg')
 // VARIABLES THAT STRUCTURE THE GAME PLAY
 // should have wrapped it inside of game objects, but I did not.
 
-let dayCount = 4
+let dayCount = 0
 let goodDeeds = 0
 let badDeeds = 0
 let timeOfDay = 7
@@ -175,52 +175,51 @@ const incrementDeed = (deed) => {
 }
 
 const createOptionButtons = (eventName) => {
-    for (let i = 0; i < eventName.options.length; i++) { // for all the non-hidden options
-        const option = eventName.options[i] // making this easier to read easier to read
+    for (let i = 0; i < eventName.options.length; i++) { // for all the options
+        const option = eventName.options[i] // making this easier to read throughout
         const hiddenMet = (typeof option.condition === 'function' && option.condition()) // if there's a hidden condition and it's met
         const notDoneForever = !(option.hideAfterClicked === true && option.alreadyClicked === true) // if it should only happen once and it already hasn't happened
-        if (notDoneForever && (hiddenMet || !option.condition)) {
+        if (notDoneForever && (hiddenMet || !option.condition)) { // it hasn't been done its one time AND it either has its conditions met or has no conditions
             const newBtn = document.createElement('button') // create a button
             newBtn.textContent = option.button // make the name of the button
-            newBtn.addEventListener('click', ()=>{
+            newBtn.addEventListener('click', ()=>{ // Single event listener which has all the stuff below
                 addToCurrentText(option.text)
                 advanceTime(option.duration)
-                const continueTo = typeof option.continue === 'function' ? option.continue() : option.continue // Thank you to my friend Max for explaining how ternaries work
+                const continueTo = typeof option.continue === 'function' ? option.continue() : option.continue // use a ternary so whether the continue part is a function or not, it's handled.
                 if (continueTo) { // checks if there is a continue location — if yes, display it.
                    continueButton(continueTo)  // makes it so clicking the button adds an appropriate continue button
-                } else if (option.repeatable != true) {
+                } else if (option.repeatable != true) { // If it's not repeatable — which really only comes up for certain button functions.
                    removeSelectedButton(newBtn) // if no continue condition, then just remove the selected option after adding the text.
                 }
-                if (option.deed) {
-                    incrementDeed(option.deed)
+                if (option.deed) { // if it has a deed
+                    incrementDeed(option.deed) // increment the deed
                 }
-                if (option.bg) {
-                    newBg(option.bg)
+                if (option.bg) { // if the option has a background
+                    newBg(option.bg) // display it
                 }
-                if (option.dailyConChanges) {
-                    changeDailyConditions(option.dailyConChanges)
+                if (option.dailyConChanges) { // if it changes daily conditions
+                    changeDailyConditions(option.dailyConChanges) // change them
                 }
-                if (option.buttonFunction) {
-                    option.buttonFunction()
+                if (option.buttonFunction) { // if the button has a function attached
+                    option.buttonFunction() // run it!
                 }
-                if (option.permConChanges) {
+                if (option.permConChanges) { // like daily cons but permanent ones
                     changePermConditions(option.permConChanges)
                 }
-            }) // makes it so clicking the button adds text to the li
-            
+            })
             if (hiddenMet) { // if there is a hidden condition and it's met
                 newBtn.style.opacity = 0 // don't initially show it
                 newBtn.classList.add("hidden-option") // give it a class that gives it transition styles
             } 
-
             optionsBox.appendChild(newBtn) // adds a new button
 
             if (option.alreadyDisplayed === false) { // if it hasn't already been displayed, wait and then change opacity
                 setTimeout(()=> {newBtn.style.opacity = 1},1000) // after 1s, then set the opacity of the hidden buttons to 1.
-                option.alreadyDisplayed = true
+                option.alreadyDisplayed = true // so if it is displayed again, it will show immediately rather than fading in.
             } else { // if it's already been displayed, just show it!
                 newBtn.style.opacity = 1
             }
+            option.alreadyClicked = true
         }
     }
 
@@ -337,8 +336,8 @@ const refreshTrinkets = () => {
     }
 }
 
-// RANDOM JOKES!
-
+// All the jokes!
+// I made this initially thinking
 const allJokes = [`"After that, I went to work at a calendar factory, but I got fired because I missed a few days."`, `"Then I got a job at a clock factory, but I got fired after putting in a lot of extra hours."`, `"I once went for a job interview at a morgue. The mortician said he was looking for someone responsible. I told him that in my last job, whenever anything went wrong, they said I was responsible. I didn't get the job."`, `"After that, I started a gym, but it didn't work out. So that's how I became a jester – there was almost nothing else left to try!"`, `"Growing up, we never had decent food. Every evening I'd ask what we were having for dinner, and my pop would said the same thing, "leftovers.” Every day it was leftovers! We never found the original meal. That’s not like the food here, which is delicious."`, `"I can’t wait to try that pudding, it looks incredible! Hey, you know what the best thing to put into a pudding is? Your teeth!"`, `"Anyway, I don’t think you’ll keep pudding up with me for much longer, so I’ll bid you good day. May Cyrrollalee, the god of hospitality, be with you all! Farewell!"`]
 
 // EVENT DATABASE
@@ -433,14 +432,12 @@ const outsideTheInn = new FairEvent ({
 			text:`As you walk towards the games you hear a heady mix of shouts from people young and old — some exulting their victories, while others bemoan their luck.`,
 			duration:.5,
 			continue: () => carnivalArea,
-			//bg:``,
 		},
 		{
 			button:`Peruse the shops`,
 			text:`You head off towards the gauntlet of sellers hawking their wares from carts, hopeful that something special will catch your eye.`,
 			duration:.5,
 			continue: () => shopsArea,
-			//bg:``,
 		},
 		{
 			button:`Head to the main tent`,
@@ -458,30 +455,38 @@ const outsideTheInn = new FairEvent ({
 			duration:0,
 			continue: () => candyChariot,
 		},
-		// {
-		// 	button:`Chase the cart`,
-		// 	text:`Remembering that the puppeteer Regis Blossombottom had his hand run over by a cart, you chase down the gnome throwing candy and tell him to be careful — you heard someone was hit by a speeding cart earlier and don't want it to happen again.`,
-		// 	duration:1,
-		// 	condition: () => metPuppeteer === true && timeOfDay < 8,
-		// 	alreadyDisplayed:false,
-		// 	dailyConChanges:[savedPuppeteer],
-		// 	deed:`good`
-		// },
+		{
+			button:`Chase the cart`,
+			text:`Remembering that the puppeteer Emery Plumwicket had his hand run over by a cart, you chase down the gnome throwing candy and tell him to be careful — you heard someone was hit by a speeding cart earlier and don't want it to happen again.`,
+			duration:1,
+			condition: () => permConditions.metEmery === true && timeOfDay < 8.5,
+			alreadyDisplayed:false,
+			dailyConChanges:["savedEmery"],
+			deed:`good`
+		},
         {
 			button:`Follow the deep footprints`,
 			text:`As you head out of town it gets easier and easier to follow the deep, gnome-sized footprints heading out to the woods. There isn't much traffic this way, and the other footprints you see clearly belong to tall folk.`,
 			duration:1,
 			alreadyDisplayed:false,
-			deed:`good`,
-            condition: () => dailyConditions.footprintsToWoods === true
+            condition: () => dailyConditions.footprintsToWoods === true,
+			continue: () => edgeOfTheWoods
 		},
         {
 			button:`Head out of town to look for Arabella`,
 			text:`You head out of town on the main road to look for Arabella. A mile outside of town you discover her wagon abandoned on the side of the road, along and a trail of tall-folk boot prints leading to the woods.`,
 			duration:1,
 			alreadyDisplayed:false,
-			deed:`good`,
-            condition: () => dailyConditions.arabellaMissing === true
+            condition: () => dailyConditions.arabellaMissing === true,
+			continue: () => edgeOfTheWoods
+		},
+        {
+			button:`Follow the tallfolks' footprints out of town`,
+			text:`When you start looking, it's pretty easy to follow the tallfolks' footprints — there look to be half a dozen of them, and their trail leads straight into the Threepenny Wood.`,
+			duration:1,
+			alreadyDisplayed:false,
+            condition: () => dailyConditions.tallfolkTracks === true,
+			continue: () => edgeOfTheWoods
 		},
 	]
 })
@@ -507,8 +512,7 @@ const candyChariot = new FairEvent ({
 			text:`When you request a candy, Nanny laughs and says, "But of course!" and holds the jar out to you with a flourish. "Choose wisely! Every choice is a good one, but it still pays to be smart about it."`,
 			duration:.5,
 			continue:() => outsideTheInn,
-            condition: () => takenCandy === false,
-			alreadyDisplayed:true,
+            condition:() => dailyConditions.takenCandy === false,
 			dailyConChanges:[`takenCandy`],
 		},
 		{
@@ -516,8 +520,7 @@ const candyChariot = new FairEvent ({
 			text:`As you reach in, Nanny raises an eyebrow and quips, "well, aren't you bold. But yes, enjoy — but no more until you come back with tales of good deeds."`,
 			duration:.5,
 			continue:() => outsideTheInn,
-            condition: () => takenCandy === false,
-			alreadyDisplayed:true,
+            condition:() => dailyConditions.takenCandy === false,
 			dailyConChanges:[`takenCandy`],
 		},
         // {
@@ -569,9 +572,9 @@ const carnivalArea = new FairEvent ({
 		},
 		{
 			button:`Watch the puppet show`,
-			text:`Looking towards the painted puppet stage, you can't help but be impressed with how attentive the young audience is. Walking over, you notice a sign: "The Legend of Mystery Hollow — told every hour on the hour."`,
-			duration:0
-			//continue:1,
+			text:`Looking towards the painted puppet stage, you can't help but be impressed with how attentive the young audience is. Walking towards it, you notice a sign: "Performances every hour on the hour."`,
+			duration:0,
+			continue:() => puppetShow,
 		},
 		{
 			button:`Look for the culprit`,
@@ -606,6 +609,9 @@ const shopsArea = new FairEvent ({
 	eventBg: 'img/market-day.jpeg',
 	location: 'shops',
     initialize: () => {
+        if (dayCount === 3) {
+            currentText.lastElementChild.textContent += " But something is different today — there's no crowd by Janphar's stall. He's just sitting there crying."
+        }
         if (dayCount === 4) {
             currentText.lastElementChild.textContent += " Wait — where's Arabella? The herbalist's wagon is missing."
         }
@@ -622,7 +628,7 @@ const shopsArea = new FairEvent ({
 			text:`The herbalist's stall isn't terribly busy as you approach — which gives you a clear view of the woodland animals carved into the wood of the stall.`,
 			duration:1.5,
 			continue: () => herbalist,
-            condition: () => dayCount != 4
+            condition: () => dayCount != 4 && dailyConditions.hasHealingPotion === false && dailyConditions.hasPotionOfPoison === false
 		},
 		{
 			button:`Check out the yard sale`,
@@ -635,15 +641,16 @@ const shopsArea = new FairEvent ({
 			button:`Browse the pottery`,
 			text:`The small stall next to the kiln is clearly the busiest stall in the area — as you approach, you see a dozen or so families all holding similar commemorative plates.`,
 			duration:1.5,
-			alreadyDisplayed:true,
-            condition: () => dayCount != 3,
+            continue:() => pottersKiln,
+            condition: () => dayCount != 3 && dailyConditions.boughtPlate === false,
 		},
 		{
 			button:`Approach the distressed potter`,
-			text:`While on other days Janphar's stall has been one of the busiest, today he sits sobbing with his head in his hands. No one is in line to buy his plates today.`,
+			text:`You walk towards Janphar, who sits sobbing with his head in his hands. Every other day there has been a crowd surrounding his stall — but not today.`,
 			duration:1.5,
 			alreadyDisplayed:false,
-            condition: () => dayCount === 3,
+            condition: () => dayCount === 3 && dailyConditions.helpedJanphar === false,
+            continue:() => brokenKiln
 		},
         {
             button: `Ask around about Arabella`,
@@ -658,10 +665,12 @@ const shopsArea = new FairEvent ({
 
 const returnToInnAtNight = new FairEvent ({
 	intro:`It's starting to get late, and you decide that you've had enough of the fair for one day. Your feet are sore from being out all day and you head is just a bit fuzzy from so much time in the sun.`,
-	secretText: `It's starting to get late, and you decide that you've had enough of the fair for one day. Your feet are sore from being out all day and you head is just a bit fuzzy from so much time in the sun.`,
 	eventBg: '',
-	options: [],
-	hiddenOptions: [
+    initialize: () => {
+        if (goodDeeds >= 3) {
+            currentText.lastElementChild.textContent += " As you make your way back, you see Nanny Cowslip's stand is still open. "
+        }
+    },	options: [
 		{
 			button:`Continue`,
 			text:`In the twilight of the day you make your way back to the inn, ready to put your head down for the night.`,
@@ -669,16 +678,15 @@ const returnToInnAtNight = new FairEvent ({
 			alreadyDisplayed:true,
 			continue: () => beginNewDay,
             bg:`img/town-night.jpg`,
-            condition: () => goodDeeds < 4
+            condition: () => goodDeeds < 4 || (goodDeeds < 3 && dayCount > 5)
 		},
 		{
 			button:`Greet Nanny Cowslip`,
-			text:`In the twilight of the day you make your way back to the inn, ready to put your head down for the night. Standing outside the inn, however, is Nanny Cowslip. As soon as she sees you she starts walking directly towards you.`,
+			text:`As soon as Nanny Cowslip sees you she starts walking directly towards you. "You seem to have done quite a few good deeds today — with some really uncanny foresight." `,
 			duration:0,
 			alreadyDisplayed:true,
             bg:`img/town-night.jpg`,
-            condition: () => goodDeeds >= 4,
-			//continue:0,
+            condition: () => goodDeeds >= 4 || (goodDeeds >= 3 && dayCount > 5),
 		}
 	]
 })
@@ -841,11 +849,6 @@ const yardSale = new FairEvent ({
 			text:`After thinking about it, you decide that none of the options really excite you and you head back to the other shops.`,
 			duration:1,
 			continue: () => shopsArea
-			//continue:0,
-			//bg:``,
-			//dailyConChanges:[],
-			//permConChanges:[],
-			//deed:``
 		},
 		{
 			button:``,
@@ -1044,11 +1047,12 @@ const herbalist = new FairEvent ({
             continue: () => shopsArea
 		},
 		{
-			button:`Listen to the child's pleas`,
+			button:`Listen to the child's pleas`, // this is a test of embedding events inside of other events. it's probably less good than just separate events.
 			text: `You move closer to hear the child over Arabella's calls for the guards.`,
 			condition: () => timeOfDay >= 10 && timeOfDay < 11 && dailyConditions.helpedJosie === false,
 			permConChanges:["stingingNettle"],
             continue: () => herbalist.options[5],
+            alreadyDisplayed: false,
             intro: `She whimpers something about a stinging nettle rash, and when you look down you see her leg is covered in a harsh looking scaly redness. When you inquire about it, she says it happened when she was picking mushrooms in the woods that morning.`,
 			options: [
 				{
@@ -1072,9 +1076,188 @@ const herbalist = new FairEvent ({
 			button:`Wait for the guards`,
 			text: `You stand by as the guards eventually come — it takes a few minutes, but when they finally arrive, they quickly take the child away.`,
 			condition: () => timeOfDay >= 10 && timeOfDay < 11 && dailyConditions.helpedJosie === false,
-			duration:1
+			duration:1,
+            alreadyDisplayed: false,
 		}
 
+	]
+})
+
+const pottersKiln = new FairEvent ({
+	intro:`One of the few things you'd heard about Honeypuddle besides the Pudding Faire is its renowned halfling potter Janphar Clayfoot — and based on the throng of people carrying his plates, that's no surprise. This year, it seems his commemorative plates bear the image of a halfling family surrounding a goat, with the eldest daughter trying to pull an onion from its mouth. You could stay and get a plate, but it might take a bit.`,
+	eventBg: 'img/potter.jpeg',
+	options: [
+		{
+			button:`Wait in line`,
+			text:`There are few souvenirs that are really worth it, but you feel like a plate that you can use or at least look at regularly is worth it. Plus, the detail is phenomenal for clay. Looking closely, you can scarcely believe it's a plate and not a drawing.`,
+			duration:4,
+			bg: 'img/plate-image.png',
+			dailyConChanges:["boughtPlate"],
+			continue:() => shopsArea
+		},
+		{
+			button:`Decide it's not worth the time`,
+			text:`The plates might be really neat, but crowded areas and long wait times just aren't what you're looking for today.`,
+			duration:.5,
+			alreadyDisplayed:false,
+			continue: () => shopsArea
+		},
+	]
+})
+
+const brokenKiln = new FairEvent ({
+	intro:`Once you are near Janphar it's not hard to see what's different: his stone kiln has shifted off its platform, and now a huge crack has appeared in its side. It seems like the kiln is broken, which means Janphar can't make plates to sell.`,
+	eventBg: 'img/broken-kiln.jpeg',
+	options: [
+		{
+			button:`Ask what happened`,
+			text:`Through wracking sobs, Janphar explains that, "some tallfolk visitors were arguing outside the kiln and then cast a spell that blasted his friends back and made this huge, thunderous clap. Their fight was scary enough, but then... then... I had to watch the kiln fall over. It felt like it happened in slow motion. And they didn't even help put it back, they just left! `,
+			duration:.5,
+			dailyConChanges: ["tallfolkTracks"]
+		},
+		{
+			button:`Try to fix the kiln`,
+			text:`Looking at the kiln, it might not be in working shape today, but it at least should get back on the platform so Janphar can try to fix it. You gather a few folks around and together are able to right the kiln.`,
+			duration:1,
+			alreadyDisplayed:false,
+			dailyConChanges:["helpedJanphar"],
+			deed:"good"
+		},
+        {
+            button:`Head back to the rest of the fair`,
+            text:`You decide it's time to head back and see what else is happening today.`,
+            duration:.5,
+            continue: () => shopsArea
+        }
+	]
+})
+
+const puppetShow = new FairEvent ({
+	intro:`Dozens of children are gathered around Emery Plumwicket's painted puppet stage to hear his performance of the “Legend of Mystery Hollow.” Their rapt attention is clearly giving their adults time to visit the cider stand, do a little shopping, and generally enjoy some fair time without their children. `,
+	eventBg: 'img/puppet-show.jpeg',
+	options: [
+		{
+			button:`Watch the performance`,
+			text:`You know that "The Legend of Mystery Hollow" is an iterative one that changes with every telling, but they share a common core. The tale always revolves around multiple species of creature struggling coexist despite depending on each other for survival. In Emery's telling, the characters are having trouble communicating with each other because of how different their biology and culture are. Ultimately, however, it resolves with the importance of open, honest communication about the needs of various members of society.`,
+			duration:1,
+			continue:() => postPuppetShow,
+		},
+
+		{
+			button:`Decide puppet shows are for kids`,
+			text:`Though the production value is high, the puppet show is still for kids — and you have other things you'd rather do today.`,
+			duration:.5,
+			continue:() => carnivalArea,
+		},
+	]
+})
+
+const postPuppetShow = new FairEvent ({
+	intro:`Towards the end of the show, you can tell that something is bothering Emery — he's only operating the moving parts of the puppets on the right side of the stage. The children barely seem to notice, applauding wildly at the end, but the longer the show went on the clearer the difference between the left and right became.`,
+	eventBg: 'img/puppet-show.jpeg',
+	initalize: () => {
+		if (dailyConditions.savedEmery === true) {
+			currentText.lastElementChild.textContent = `You applaud loudly — watching Emery perform with both his hands working is truly a thing of magic. He was impressive before, but this was on an entirely different level.`
+		} else {
+			currentText.lastElementChild.textContent = `Towards the end of the show, you can tell that something is bothering Emery — he's only operating the moving parts of the puppets on the right side of the stage. The children barely seem to notice, applauding wildly at the end, but the longer the show went on the clearer the difference between the left and right became.`
+		}
+
+	},
+	options: [
+		{
+			button:`Head back to the rest of the fair`,
+			text:`You shrug off whatever it was, clearly it didn't bother the children — you've rarely seen a group of kids be so calm when there's so much going on around them.`,
+			duration:0,
+			continue:() => carnivalArea,
+			condition:() => dailyConditions.savedEmery === false
+		},
+
+		{
+			button:`Stick around and talk to Emery`,
+			text:`Once the kids leave, you make your way over to the forest gnome, who has a deeply worried look on his face.`,
+			duration:.5,
+			continue:() => talkingToEmery,
+			condition:() => dailyConditions.savedEmery === false
+		},
+		{
+			button:`Head back to the rest of the fair`,
+			text:`Smiling at how delightful the performance was, you head back to see what else there is to do today.`,
+			duration:0,
+			continue:() => carnivalArea,
+			condition:() => dailyConditions.savedEmery === true
+		},
+
+		{
+			button:`Stick around and talk to Emery`,
+			text:`You congratulate Emery on a fantastic performance, and he seems delighted to chat — before needing to run and reset the puppets for the next show.`,
+			duration:.5,
+			continue:() => carnivalArea,
+			condition:() => dailyConditions.savedEmery === true
+		},
+	]
+})
+
+const talkingToEmery = new FairEvent ({
+	intro:`The forest gnome greets you when you walk up with a question: "Tell me, how bad was it? I'm not sure I can put on another performance after that one." He holds up his left hand, which is a mess of clearly broken fingers. "I slipped in the mud and a cart ran over them this morning. Makes me feel like a damn fool. Tell me, you're here alone — any chance you'll help me out for a few shows today and operate the puppets? It means so much to the kids, and I'm not sure I can do more."`,
+	eventBg: 'img/puppet-show.jpeg',
+	options: [
+		{
+			button:`Volunteer to help`,
+			text:`You think for a few moments, and then decide you have nothing better to do. Emery gives you a quick crash course on puppeteering and gives you some tips on storytelling. It's smooth sailing all day, and while it's exhausting, it's also delightful seeing the kids get so much joy out of all your performances.`,
+			duration:8,
+			continue:() => carnivalArea,
+			permConChanges: ["metEmery"],
+			deed:"good"
+		},
+
+		{
+			button:`Politely decline`,
+			text:`You tell Emery that you can't help — you're only here for the fair and can't miss it all to put on a puppet show.`,
+			duration:.5,
+			continue:() => carnivalArea,
+			dailyConChanges:["declinedEmery"]
+		},
+	]
+})
+
+const edgeOfTheWoods = new FairEvent ({
+	intro:`Threepenny Wood stretches for five miles along the banks of the River Chionthar. The wood is sheltered from the wind by low hills, allowing plant and animal life to flourish. `,
+	eventBg: 'img/edge-of-woods.jpg',
+	initialize: () => {
+		let baseText = currentText.lastElementChild
+		let dayOneText = `Animal trails crisscross Threepenny Wood, making it easy to navigate.`
+		let dayTwoText = `There are plenty of animal trails crisscrossing the area, making it easy to follow, but gnarled tree roots force you to watch the ground to avoid tripping.`
+		let dayThreeText = `The woods seem overgrown, and difficult to traverse — and a couple of times you'd swear a squirrel looked at you like it wanted to take a bite.`
+		let dayFiveText = `You've always heard nice things about the Threepenny Wood, but there's a deep sense of dread oozing from it that makes you feel like turning back.`
+		if (dayCount === 1) {
+			baseText += dayOneText
+		} else if (dayCount === 2) {
+			baseText += dayTwoText
+		} else if (dayCount === 3 || dayCount === 4) {
+			baseText += dayThreeText
+		} else {
+			baseText += dayFiveText
+		}
+	},
+	options: [
+		{
+			button:`Head back to town`,
+			text:`There's something you don't like about going into the woods right now on your own — and you decide that you'd rather be back at the fair today.`,
+			duration:1,
+			continue:() => outsideTheInn,
+		},
+		{
+			button:`Keep following the gnomeish tracks`,
+			text:``,
+			duration:1.5,
+			condition: () => dailyConditions.footprintsToWoods === true
+		},
+		{
+			button:`Keep following the tallfolk's tracks`,
+			text:``,
+			duration:.5,
+			condition: () => dailyConditions.tallfolkTracks === true || dailyConditions.arabellaMissing === true
+		},
 	]
 })
 
@@ -1094,14 +1277,20 @@ const dailyConditions = {
     "hasPotionOfPoison": false,
     "purchasedBalm": false,
     "pickupPotion": false,
-    "helpedJosie": false
+    "helpedJosie": false,
+    "boughtPlate":false,
+    "helpedJanphar":false,
+    "tallfolkTracks":false,
+    "declinedEmery":false,
+    "savedEmery":false
 }
 
 const permConditions = {
     "piedInFace":false,
     "dodgedPie": false,
     "knowHowToCalmCaric": false,
-    "poppysRoutine":false
+    "poppysRoutine":false,
+    "metEmery":false
 }
 
 const resetDailyConditions = () => { // for all the daily conditions, set them to false or 0, depending
