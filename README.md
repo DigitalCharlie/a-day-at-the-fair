@@ -49,4 +49,6 @@ Of course, because this was done for an assignment, there are also a few places 
 
 Additionally, I don't fully understand what scope I should give variables, what should wrapped inside of other objects (I've been told I should have a game object, for example), and I think understanding some of that better would help me write cleaner code.
 
-Finally, the continue system feels awkward — I found that I needed to either have a database of all the events and then call them from that object with a key value pair, or run a simple function each time to just return the event that should be continued to. I think there's a better solution out there, but I'm not clear what it is yet.
+The continue system feels awkward — I found that I needed to either have a database of all the events and then call them from that object with a key value pair, or run a simple function each time to just return the event that should be continued to. I think there's a better solution out there, but I'm not clear what it is yet.
+
+In terms of gameplay, there are a few features I'd add — the top of the list are some kind of inventory and clock systems that let players see when events transpired each day, as well as what they have on them. That might also make their money a bit more meaningful, and introduce opportunities to gain money as well. 
