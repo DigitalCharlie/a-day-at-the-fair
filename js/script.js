@@ -1142,7 +1142,7 @@ const herbalist = new FairEvent ({
 		{
 			button:`Offer to buy pay for Josie's future theft`,
 			text:`You awkwardly tell the tabaxi that a small child is going to try and steal some balm for a stinging nettle rash sometime this morning — and offer her a gold piece to just let her go.`,
-			condition: () => permConditions.knowAboutJosie === true,
+			condition: () => permConditions.knowAboutJosie === true && timeOfDay < 10 && dailyConditions.paidForJosie === false,
 			alreadyDisplayed:false,
 			dailyConChanges:["paidForJosie"],
 		},
@@ -1151,37 +1151,42 @@ const herbalist = new FairEvent ({
 			text: `You move closer to hear the child over Arabella's calls for the guards.`,
 			condition: () => timeOfDay >= 10 && timeOfDay < 12 && dailyConditions.helpedJosie === false && dailyConditions.pickupPotion === false && dailyConditions.paidForJosie === false,
 			permConChanges:["stingingNettle"],
-            continue: () => herbalist.options[5],
+            continue: () => josieIsCaught,
             alreadyDisplayed: false,
-            intro: `She whimpers something about a stinging nettle rash, and when you look down you see her leg is covered in a harsh looking scaly redness. When you inquire about it, she says it happened when she was picking mushrooms in the woods that morning.`,
-			options: [
-				{
-					button:`Offer to buy the balm`,
-					text:`When you offer up a gold to Arabella on behalf of the child she rolls her eyes and says, "And your kind think our coats are soft. Well fine, coin is coin. Anything else?"`,
-					duration:.5,
-					continue: () => herbalist,
-					dailyConChanges:["helpedJosie"],
-					permConChanges:["knowAboutJosie"],
-                    deed: "good"
-				},
-				{
-					button:`Admonish Josie`,
-					text:`You tell Josie that stealing is wrong and she needs to suffer the consequences of her actions. You go back to browsing the potions.`,
-					duration:.5,
-					continue: () => herbalist,
-					dailyConChanges:["helpedJosie"],
-					permConChanges:["knowAboutJosie"],
-				}
-			]
+
+		},
+	]
+})
+
+const josieIsCaught = new FairEvent ({
+	intro: `She whimpers something about a stinging nettle rash, and when you look down you see her leg is covered in a harsh looking scaly redness. When you inquire about it, she says it happened when she was picking mushrooms in the woods that morning.`,
+	eventBg: 'img/herbalist.jpeg',
+	options: [
+		{
+			button:`Offer to buy the balm`,
+			text:`When you offer up a gold to Arabella on behalf of the child she rolls her eyes and says, "And your kind think our coats are soft. Well fine, coin is coin. Anything else?"`,
+			duration:.5,
+			continue: () => herbalist,
+			dailyConChanges:["helpedJosie"],
+			permConChanges:["knowAboutJosie"],
+			deed: "good"
+		},
+		{
+			button:`Admonish Josie`,
+			text:`You tell Josie that stealing is wrong and she needs to suffer the consequences of her actions. You go back to browsing the potions.`,
+			duration:.5,
+			continue: () => herbalist,
+			dailyConChanges:["helpedJosie"],
+			permConChanges:["knowAboutJosie"],
 		},
 		{
 			button:`Wait for the guards`,
 			text: `You stand by as the guards eventually come — it takes a few minutes, but when they finally arrive, they quickly take the child away.`,
-			condition: () => timeOfDay >= 10 && timeOfDay < 12 && dailyConditions.helpedJosie === false && dailyConditions.pickupPotion === false && dailyConditions.paidForJosie === false,
-			duration:2,
-            alreadyDisplayed: false,
+			duration:2.5,
+			permConChanges:["knowAboutJosie"],
+			dailyConChanges:["helpedJosie"],
+			contninue: () => herbalist,
 		}
-
 	]
 })
 
