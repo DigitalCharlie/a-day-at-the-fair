@@ -475,7 +475,7 @@ const beginNewDay = new FairEvent ({
 			text:`Considering your options for a moment, you decide that this whole thing is too much and opt to just go downstairs to have a morning pint or four. Plus, now you can see whether hangovers carry over.`,
 			duration:0,
             continue: () => daytimeInn,
-			condition: () => dayCount > 3,
+			condition: () => dayCount >= 3,
 			alreadyDisplayed: false,
 		},
 		{
