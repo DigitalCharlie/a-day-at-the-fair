@@ -360,12 +360,10 @@ const allJokes = [`"After that, I went to work at a calendar factory, but I got 
 // FINAL BATTLE — again, out of time so it seems kind of rough but it's working.
 
 const progressFinalBattle = () => {
-	console.log("test")
 	if (dailyConditions.distractionCount >= 4) {
 		currentText.lastElementChild.textContent += ` But with that distraction, you see a blast of light from over your shoulder and Urdlen's eyes go wide. He begins to open his mouth, but before he can say anything he disappears without any trace left behind.`
 		continueButton(victoryEvent)
 	}
-	console.log("test3")
 }
 
 const victory = () => { // Honestly I ran out of time for this so we'll see how it works
