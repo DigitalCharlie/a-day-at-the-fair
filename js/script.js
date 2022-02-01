@@ -1145,6 +1145,7 @@ const herbalist = new FairEvent ({
 			condition: () => permConditions.knowAboutJosie === true && timeOfDay < 10 && dailyConditions.paidForJosie === false,
 			alreadyDisplayed:false,
 			dailyConChanges:["paidForJosie"],
+			deed:"good"
 		},
 		{
 			button:`Listen to the child's pleas`, // this is a test of embedding events inside of other events. it's probably less good than just separate events.
