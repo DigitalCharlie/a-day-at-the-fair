@@ -65,7 +65,6 @@ const nameAdventurer = () => {
     } else {
         adventurers.push(new Adventurer("Traveler")) // default if it is blank — this will get used as easter egg dialogue later
     }
-    console.log('Adventurer is now named ' + adventurers[0].name)
     textBox.classList.add('text-adventure-justify')
     introText.hidden = true
     currentText.hidden = false
@@ -95,36 +94,34 @@ const removeSelectedButton = (button) => {
     button.remove()
 }
 
-const addToCurrentText = (text) => {
+const addToCurrentText = (text, delay) => {
     let newText = document.createElement('li') // create a new list item
     newText.textContent = text // make the text of the new list item equal to whatever the input text is
     let newHistoryText = newText.cloneNode(true)
-    currentText.appendChild(newText) // adds it to the UL that holds text
+	if (delay === true) {
+		newText.classList.add("hidden-text")
+		setTimeout(()=> {
+			currentText.appendChild(newText) // adds it to the UL that holds text
+		},1000)
+		setTimeout(()=> {
+			newText.classList.remove("hidden-text")
+		},1100)
+	} else {
+		currentText.appendChild(newText) // adds it to the UL that holds text
+	}
     historyContents.lastElementChild.appendChild(newHistoryText) // adds it to the history as well
     currentText.scrollTop = currentText.scrollHeight
 }
 
-const delayAddToCurrentText = (text) => {
-	let newText = document.createElement('li') // create a new list item
-	newText.textContent = text // make the text of the new list item equal to whatever the input text is
-	let newHistoryText = newText.cloneNode(true)
-	// newText.style.color = "rgba(255,255,255,0)"
-	newText.classList.add("hidden-text")
-	historyContents.lastElementChild.appendChild(newHistoryText) // adds it to the history as well
-	currentText.scrollTop = currentText.scrollHeight
-	setTimeout(()=> {
-		currentText.appendChild(newText) // adds it to the UL that holds text
-	},1000) // after 1s, then set the opacity of the hidden li to 1.
-	setTimeout(()=> {
-		newText.classList.remove("hidden-text")
-	},1100) // after 1s, then set the opacity of the hidden li to 1.
-}
 
 const continueButton = (eventName) => {
     clearButtons() // gets rid of all the current buttons
     const newBtn = document.createElement('button') // creates a new button
     newBtn.textContent = "Continue" // makes it so the text of the new button is continue 
-    if (eventName != (beginNewDay || returnToInnAtNight || caughtInSling || orcCamp || talkingToIork || inTheCamp) && timeOfDay >= 17) {
+	const finalEvents = [beginNewDay, returnToInnAtNight, caughtInSling, orcCamp, talkingToIork, inTheCamp, talkingToCyrrollalee, edgeOfTheWoods, confrontingUrdlen]
+    if (dailyConditions.confrontedCyrrollalee === true && timeOfDay >=16.5) {
+		newBtn.addEventListener('click', ()=>{newEvent(edgeOfTheWoods)})
+	} else if (!finalEvents.includes(eventName) && timeOfDay >= 16.5) {
         returnToInnBg()
         newBtn.addEventListener('click', ()=>{newEvent(returnToInnAtNight)})
     } else {
@@ -156,7 +153,7 @@ const newEvent = (eventName) => {
     if (eventName === beginNewDay) {
         dayCount++ // advance day counter
         timeOfDay = 7 // set time to 7am
-        goodDeeds = 0
+        goodDeeds = 4
         badDeeds = 0
         resetDailyConditions()
         newHistoryDay() // add a new day header in the history bar
@@ -389,7 +386,7 @@ const beginNewDay = new FairEvent ({
 			button:`Head off to the fair`,
 			text:`You put on your boots and head out of the inn, not wanting to waste a single moment of the day.`,
 			duration:0,
-			continue: () => outsideTheInn,
+			continue: () => outsideTheInn
 		},
 		{
 			button:`Observe for a few minutes`,
@@ -446,7 +443,7 @@ const outsideTheInn = new FairEvent ({
     eventBg: 'img/the-faire.png',
 	initialize: () => {
 		if (timeOfDay >= 12.5) {
-			delayAddToCurrentText("You hear shouts of panic coming from the main tent area — it's hard to make it out from here, but you're pretty sure you hear the word 'frog.'")
+			addToCurrentText("You hear shouts of panic coming from the main tent area — it's hard to make it out from here, but you're pretty sure you hear the word 'frog.'", true)
 		}
 	},
 	options: [
@@ -477,6 +474,7 @@ const outsideTheInn = new FairEvent ({
 			text:`Something about the brightly painted chariot catches your eye and you approach Nanny Cowslip's Chariot of Consummate Confections`,
 			duration:0,
 			continue: () => candyChariot,
+			condition: () => dailyConditions.confrontedCyrrollalee === false
 		},
 		{
 			button:`Chase the cart`,
@@ -526,6 +524,7 @@ const candyChariot = new FairEvent ({
 	intro:`Nanny Cowslip sells candy from the back of a chariot purple chariot with three enlarged kittens on her lap with collars reading Snap, Crackle, and Pop. A jar of glowing jelly beans labeled “MAGIC CANDY” sits on her counter alongside trays of sherbet lemons, honeycomb toffees, and peppermint bonbons. As you come closer, Nanny Cowslip smiles and says, "One good deed gets you one jelly bean! But of course the first one's on me because just being here is doing good for the town."`,
 	returningIntro: `When you approach the stall again, Nanny smiles at you and says, "Ooh back again? Well I trust you've done something worth another candy!"`,
     eventBg: 'img/nanny-2.png',
+	initialize: () => candyChariot.options[4].text = `You ask Nanny Cowslip how you've been doing today — and she happily tells you that you've done ` + goodDeeds + ` today. "Not bad!" she says and tosses you a candy.`,
 	options: [
 		{
 			button:`Ask what's in the candy`,
@@ -554,13 +553,20 @@ const candyChariot = new FairEvent ({
             condition:() => dailyConditions.takenCandy === false,
 			dailyConChanges:[`takenCandy`],
 		},
-        // {
-		// 	button:`Confront her about her identity`,
-		// 	text:`As soon as you mention that you know she's really Cyrrollalee, she hushes you and tells you to get in the cart so you can talk. As soon as you step inside, it takes off — proving those wings aren't for show — and touches down on the edge of the woods outside of town.`,
-		// 	duration:0,
-		// 	condition: knowCyrrollalee,
-		// 	alreadyDisplayed:false,
-		// },
+		{
+			button:`Ask about your good deeds`,
+			text:`You ask Nanny Cowslip how you've been doing today — and she happily tells you that you're doing just fine.`,
+			condition:() => goodDeeds > 0
+		},
+        {
+			button:`Confront her about her identity`,
+			text:`As soon as you mention that you know she's really Cyrrollalee, she hushes you and tells you to get in the cart so you can talk.`,
+			duration:.5,
+			condition: () => permConditions.knowCyrrollalee === true,
+			continue: () => confrontCyrrollalee,
+			alreadyDisplayed:false,
+			dailyConChanges: ["confrontedCyrrollalee"]
+		},
 	]
 })
 
@@ -574,9 +580,9 @@ const carnivalArea = new FairEvent ({
             let firstInitText = " As you consider your options, a custard tart comes flying at you and catches you on the side of the face."
             let laterInitText = " As you consider your options, a familiar custard tart comes flying at you."
             if (permConditions.piedInFace === true) {
-                delayAddToCurrentText(laterInitText)
+                addToCurrentText(laterInitText, true)
             } else {
-                delayAddToCurrentText(firstInitText)
+                addToCurrentText(firstInitText, true)
             }
             dailyConditions.piedToday = true
         }
@@ -640,10 +646,10 @@ const shopsArea = new FairEvent ({
 	location: 'shops',
     initialize: () => {
         if (dayCount === 3) {
-            delayAddToCurrentText("Something is different today — there's no crowd by Janphar's stall. He's just sitting there crying.")
+            addToCurrentText("Something is different today — there's no crowd by Janphar's stall. He's just sitting there crying.", true)
         }
         if (dayCount === 4) {
-            delayAddToCurrentText("Wait — where's Arabella? The herbalist's wagon is missing.")
+            addToCurrentText("Wait — where's Arabella? The herbalist's wagon is missing.", true)
         }
     },
 	options: [
@@ -697,8 +703,8 @@ const returnToInnAtNight = new FairEvent ({
 	intro:`It's starting to get late, and you decide that you've had enough of the fair for one day. Your feet are sore from being out all day and you head is just a bit fuzzy from so much time in the sun.`,
 	eventBg: '',
     initialize: () => {
-        if (goodDeeds >= 3) {
-            delayAddToCurrentText(" As you make your way back, you see Nanny Cowslip's stand is still open.")
+        if (goodDeeds >= 4 || (goodDeeds >= 3 && dayCount > 5)) {
+            addToCurrentText(" As you make your way back, you see Nanny Cowslip's stand is still open — and she's walking right towards you.", true)
         }
     },	options: [
 		{
@@ -712,11 +718,12 @@ const returnToInnAtNight = new FairEvent ({
 		},
 		{
 			button:`Greet Nanny Cowslip`,
-			text:`As soon as Nanny Cowslip sees you she starts walking directly towards you. "You seem to have done quite a few good deeds today — with some really uncanny foresight." `,
+			text:`"You seem to have done quite a few good deeds today — with some really uncanny foresight. Come, walk with me." `,
 			duration:0,
 			alreadyDisplayed:true,
             bg:`img/town-night.jpg`,
             condition: () => goodDeeds >= 4 || (goodDeeds >= 3 && dayCount > 5),
+			continue: () => talkingToCyrrollalee
 		}
 	]
 })
@@ -820,6 +827,11 @@ const ciderStall = new FairEvent ({
 const caricatureStall = new FairEvent ({
 	intro:`As you get approach the caricature booth, it's obvious to you that the artist only dabbles in portraits — the real masterpieces are the landscape paintings that are displayed around the stall. `,
 	eventBg: 'img/caricature.jpeg',
+	initialize: () => {
+		if(timeOfDay >= 14) {
+			addToCurrentText(`As you approach the stall, you can hear a good bit of shouting — it seems that the current subject is not too happy with how their being drawn.`,true)
+		}
+	},
 	options: [
 		{
 			button:`Wander away`,
@@ -975,7 +987,6 @@ const daytimeInn = new FairEvent ({
             condition: () => permConditions.poppysRoutine === true && dailyConditions.jokeCount < 7,
             dailyConChanges:["improvedRoutine"]
         }
-
 	]
 })
 
@@ -1024,8 +1035,8 @@ const herbalist = new FairEvent ({
 			stickFigureText = `You notice one other carving - a creepy, stick-thin horned figure about ` + dayCount * 2 + ` hand-lengths from the back of the wagon.`
             lastText.textContent += stickFigureText
 		}
-		if (timeOfDay >= 10 && timeOfDay < 12 && dailyConditions.helpedJosie === false && dailyConditions.pickupPotion === false) {
-            delayAddToCurrentText(`Suddenly, the tabaxi whirls around and picks up a child by the wrist. "Oh no you don't!" she says. Then she shouts loudly for the fairground overseers, asking them to come deal with the young thief.`)
+		if (timeOfDay >= 10 && timeOfDay < 12 && dailyConditions.helpedJosie === false && dailyConditions.pickupPotion === false && dailyConditions.paidForJosie === false) {
+            addToCurrentText(`Suddenly, the tabaxi whirls around and picks up a child by the wrist. "Oh no you don't!" she says. Then she shouts loudly for the fairground overseers, asking them to come deal with the young thief.`, true)
 		}
         if (dailyConditions.pickupPotion === true) {
             addToCurrentText(`You pick up a red vial and look at how beautifully it shimmers. As you eye it, Arabella chimes in, "Oh! That's the potion of posion. It's made to look just like a healing potion, sorry, this is the one you want."`)
@@ -1074,9 +1085,16 @@ const herbalist = new FairEvent ({
             continue: () => shopsArea
 		},
 		{
+			button:`Offer to buy pay for Josie's future theft`,
+			text:`You awkwardly tell the tabaxi that a small child is going to try and steal some balm for a stinging nettle rash sometime this morning — and offer her a gold piece to just let her go.`,
+			condition: () => permConditions.knowAboutJosie === true,
+			alreadyDisplayed:false,
+			dailyConChanges:["paidForJosie"],
+		},
+		{
 			button:`Listen to the child's pleas`, // this is a test of embedding events inside of other events. it's probably less good than just separate events.
 			text: `You move closer to hear the child over Arabella's calls for the guards.`,
-			condition: () => timeOfDay >= 10 && timeOfDay < 12 && dailyConditions.helpedJosie === false && dailyConditions.pickupPotion === false,
+			condition: () => timeOfDay >= 10 && timeOfDay < 12 && dailyConditions.helpedJosie === false && dailyConditions.pickupPotion === false && dailyConditions.paidForJosie === false,
 			permConChanges:["stingingNettle"],
             continue: () => herbalist.options[5],
             alreadyDisplayed: false,
@@ -1088,6 +1106,7 @@ const herbalist = new FairEvent ({
 					duration:.5,
 					continue: () => herbalist,
 					dailyConChanges:["helpedJosie"],
+					permConChanges:["knowAboutJosie"],
                     deed: "good"
 				},
 				{
@@ -1096,13 +1115,14 @@ const herbalist = new FairEvent ({
 					duration:.5,
 					continue: () => herbalist,
 					dailyConChanges:["helpedJosie"],
+					permConChanges:["knowAboutJosie"],
 				}
 			]
 		},
 		{
 			button:`Wait for the guards`,
 			text: `You stand by as the guards eventually come — it takes a few minutes, but when they finally arrive, they quickly take the child away.`,
-			condition: () => timeOfDay >= 10 && timeOfDay < 12 && dailyConditions.helpedJosie === false && dailyConditions.pickupPotion === false,
+			condition: () => timeOfDay >= 10 && timeOfDay < 12 && dailyConditions.helpedJosie === false && dailyConditions.pickupPotion === false && dailyConditions.paidForJosie === false,
 			duration:2,
             alreadyDisplayed: false,
 		}
@@ -1241,7 +1261,8 @@ const talkingToEmery = new FairEvent ({
 			text:`You tell Emery that you can't help — you're only here for the fair and can't miss it all to put on a puppet show.`,
 			duration:.5,
 			continue:() => carnivalArea,
-			dailyConChanges:["declinedEmery"]
+			dailyConChanges:["declinedEmery"],
+			permConChanges: ["metEmery"],
 		},
 	]
 })
@@ -1264,6 +1285,12 @@ const edgeOfTheWoods = new FairEvent ({
 		} else {
 			baseText.textContent += dayFiveText
 		}
+		if (dailyConditions.disclosedLoopToNanny === true) {
+			baseText.textContent += ` You see her move quickly and decisively into the woods — you'll have to pick up the pace to keep up with her.`
+		}
+		if (dailyConditions.confrontedCyrrollalee === true) {
+			baseText.textContent += ` You see Cyrrollalee waiting for you on the edge of Threepenny Wood. As you approach she smiles and says, "ready when you are!"`
+		}
 	},
 	options: [
 		{
@@ -1271,18 +1298,19 @@ const edgeOfTheWoods = new FairEvent ({
 			text:`There's something you don't like about going into the woods right now on your own — and you decide that you'd rather be back at the fair today.`,
 			duration:1,
 			continue:() => outsideTheInn,
+			condition: () => dailyConditions.disclosedLoopToNanny === false && dailyConditions.confrontedCyrrollalee === false
 		},
 		{
 			button:`Keep following the gnomeish tracks`,
-			text:`You head into the forest, focusing on following the smallest of the footprints you see. The path twists and turns through the woods, and you're sure a couple of times the trail loops back on itself. `,
+			text:`You head into the forest, focusing on following the smallest of the footprints you see. The path twists and turns through the woods, and you're sure a couple of times the trail loops back on itself. You eventually lose the trail and wind up back at the edge of the woods.`,
 			duration:1.5,
-			condition: () => dailyConditions.footprintsToWoods === true
+			condition: () => dailyConditions.footprintsToWoods === true && dailyConditions.disclosedLoopToNanny === false && dailyConditions.confrontedCyrrollalee === false
 		},
 		{
 			button:`Keep following the tallfolk's tracks`,
 			text:`It's not terribly difficult for you to follow the tracks through the forest — there are at least 3 tallfolk, and they weren't walking single file so there's plenty of evidence of their passage.`,
 			duration:.5,
-			condition: () => dailyConditions.tallfolkTracks === true || dailyConditions.arabellaMissing === true,
+			condition: () => (dailyConditions.tallfolkTracks === true || dailyConditions.arabellaMissing === true) && dailyConditions.disclosedLoopToNanny === false && dailyConditions.confrontedCyrrollalee === false,
 			buttonFunction: () => {
 				if (dailyConditions.arabellaMissing === true) {
 					currentText.lastElementChild.textContent += " It certainly doesn't hurt that it looks like they were dragging something with them."
@@ -1295,7 +1323,7 @@ const edgeOfTheWoods = new FairEvent ({
 			button:`Head back to the orc camp`,
 			text:`It's not terribly difficult for you to find your way back to the orc camp.`,
 			duration:.5,
-			condition: () => permConditions.foundOrcCamp === true && permConditions.orcsWillHelp === false && dailyConChanges.arabellaMissing === false,
+			condition: () => permConditions.foundOrcCamp === true && permConditions.orcsWillHelp === false && dailyConChanges.arabellaMissing === false && dailyConditions.disclosedLoopToNanny === false && dailyConditions.confrontedCyrrollalee === false,
 			buttonFunction: () => {
 				if (dailyConditions.arabellaMissing === true) {
 					currentText.lastElementChild.textContent += " It certainly doesn't hurt that it looks like they were dragging something with them."
@@ -1306,8 +1334,20 @@ const edgeOfTheWoods = new FairEvent ({
 		{
 			button:`Tell the orcs it's time`,
 			text:`You call out to the orcs that it's time to get us out of the loop. After a few moments you see Iork come running to greet you. "You had better not be lying, little one."`,
-			condition: () => permConditions.orcsWillHelp === true,
+			condition: () => permConditions.orcsWillHelp === true && (dailyConditions.disclosedLoopToNanny === true || permConditions.confrontedCyrrollalee === true),
 			dailyConChanges:["orcsAreHelping"]
+		},
+		{
+			button: `Hurry after Nanny Cowslip`,
+			text:`You hurry after Nanny into the Threepenny Wood, and, after trailing her for almost hour through the woods, you come to your destination.`,
+			condition: () => dailyConditions.disclosedLoopToNanny === true && dailyConditions.confrontedCyrrollalee === false,
+			continue: () => confrontingUrdlen
+		},
+		{
+			button: `Trail Cyrrollalee to her meeting with Urdlen`,
+			text:`You hurry after Cyrrollalee into the Threepenny Wood, trailing her to her daily confrontation with Urdlen.`,
+			condition: () => permConditions.confrontedCyrrollalee === true,
+			continue: () => confrontingUrdlen
 		}
 	]
 })
@@ -1470,6 +1510,81 @@ const talkingToIork = new FairEvent ({
 	]
 })
 
+const talkingToCyrrollalee = new FairEvent ({
+	intro:`Nanny Cowslip leads you to the outskirts of town as you talk — all the while asking probing questions about how you were able to almost predict bad things before they happened.`,
+	eventBg:`img/town-night.jpg`,
+	initialize: () => {
+		if (adventurers[0].name != "Traveler") {
+			talkingToCyrrollalee.options[2].text = `For a moment she just stares at you before bursting out laughing. Oh, ` + adventurers[0].name + `, that's hilarious. I can tell you're still green — I appreciate the humor, but I don't appreciate lies. Try again." You're pretty sure you never told her (or anyone in Honeypuddle) your name.`
+		}
+	},
+	options: [
+		{
+			button:`Tell her about the time loop`,
+			text:`She blinks a couple times and says, "No, that couldn't be... could it? No, no, I'd know if something like that were happening. I'm going to go make some inquiries." You think about letting Nanny make her inquiries alone, but decide that maybe it's better if you follow along... secretly.`,
+			dailyConChanges:["disclosedLoopToNanny"],
+			continue: () => edgeOfTheWoods,
+		},
+		{
+			button: `Try to pass it off as luck`,
+			text:`She chuckles at your attempt to pass it off as luck. "I know luck far greater than you could imagine. Your day today was knowledge and skill."`,
+		},
+		{
+			button: `Boast that it's your adventuring prowess`,
+			text:`For a moment she just stares at you before bursting out laughing. That's hilarious. I can tell you're still green — I appreciate the humor, but I don't appreciate lies. Try again."`,
+		},
+		{
+			button: `Smile awkwardly`,
+			text:`The two of you smile at each other for a few moments. Oddly enough, she doesn't blink and you're pretty sure she can smile longer than you can.`,
+		},
+		{
+			button:`Go to sleep`,
+			text:`You resolutely refuse to tell Nanny Cowslip the secret to your success, and head back to the inn the sleep.`,
+			continue: () => beginNewDay,
+		},
+	]
+})
+
+const confrontCyrrollalee = new FairEvent ({
+	intro:`As soon as you step inside Cyrrollalee's cart, it sprouts butterfly wings and takes to the air. Once you're safely outside the town, she turns to you with a great big smile and asks, "So! What gave me away?`,
+	eventBg:`img/flying-cart.jpeg`,
+	options: [
+		{
+			button:`Tell her about the time loop`,
+			text:`She blinks a couple times and says, "No, that couldn't be... could it? No, no, I'd know if something like that were happening. I'm going t-" and you finish her sentence for her, telling her that's exactly what she said last night.`,
+		},
+		{
+			button: `Tell her about what happened in the forest`,
+			text:`You relay what happened the night before as clearly as you can — hitting the notes about Urdlen, his various threats, and how the final confrontation played out. She started casting a spell of banishment, but he was faster and turned her to stone — giving him ample time to cast the spell.`
+		},
+		{
+			button: `Ask her who Urdlen is`,
+			text:`Cyrrollalee explains that he's another gnomish deity, but a far more evil one — he's known as the crawler below, and takes the form of a white mole, blind, hairless, sexless, but with claws of steel. He would have been fully pushed out of the pantheon, but someone talked about the benefits of leaving him as a warning against bloodlust.`
+		},
+		{
+			button: `Ask her what the plan is`,
+			text:`She says that, given she's failed on her own, the plan is going to have to rely on you to distract Urdlen. We'll have to rely on some amount of surprise to make it work, and it'll take 30 seconds or so to finish casting. As she drops you back outside the inn, she tells you to spend the day getting ready and meet her at the edge of the woods this evening ready to put the plan into action.`,
+			continue:() => outsideTheInn,
+		}
+	]
+})
+
+const confrontingUrdlen = new FairEvent ({
+	intro:``,
+	eventBg:`img/blighted-forest.jpg`,
+	options: [
+		{
+			button:`Stay silent`,
+		},
+		{
+			button: `Plead for mercy`,
+		},
+		{
+			button: `Try to bargain`,
+		}
+	]
+})
+
 // LIST OF CONDITIONS, MOSTLY FOR REFERENCE SINCE THEY DON'T NEE TO EXIST UNTIL I CREATE THEM.
 
 const dailyConditions = {
@@ -1494,7 +1609,10 @@ const dailyConditions = {
     "savedEmery":false,
 	"snuckToCamp":false,
 	"walkedToCamp": false,
-	"orcsAreHelping":false
+	"orcsAreHelping":false,
+	"paidForJosie":false,
+	"disclosedLoopToNanny":false,
+	"confrontedCyrrollalee":false
 }
 
 const permConditions = {
@@ -1505,7 +1623,9 @@ const permConditions = {
     "metEmery":false,
 	"slingTrapTriggered":false,
 	"confrontedCyrrollalee": false,
-	"orcsWillHelp":false
+	"orcsWillHelp":false,
+	"knowAboutJosie":false,
+	"knowCyrrollalee":false
 }
 
 const resetDailyConditions = () => { // for all the daily conditions, set them to false or 0, depending
