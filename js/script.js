@@ -257,8 +257,8 @@ const newBg = (backgroundImage) => {
 const toggleBg = () => {
     const topBg = document.querySelector("#bg div:nth-child(2)")
     const bottomBg = document.querySelector("#bg div:nth-child(1)")
-    topBg.style.opacity = 0
     bottomBg.style.opacity = 1
+	setTimeout(() => {topBg.style.opacity = 0},25);
     setTimeout(() => {topBg.remove()}, 500);
 }
 
