@@ -1649,12 +1649,14 @@ const confrontingUrdlen = new FairEvent ({
 		{
 			button: `Run out and start distracting Urdlen`,
 			text:`You dash out from your hiding spot and come face to face with a very angry, very confused gnome whose claws are much sharper up close than you realized.`,
-			continue: () => finalBattle
+			continue: () => finalBattle,
+			condition: () => dailyConditions.confrontedCyrrollalee === true,
 		},
 		{
 			button: `Stay hidden`,
 			text:`Cyrrollalee responds with a deep sigh, and twirls around in a flash of light, revealing... her true, glowy self. "You're Urdlen, aren't you — why can't you just stay in your own domain. No matter, you won't be staying here and you certainly won't be coming to the festival." Cyrrollalee looks around, confused, then begins casting her spell — but just as she begins the motions, Urdlen casually flips his hand, turning Cyrrollalee to stone where she stands. Then, he shrieks the words of his curse: “Gods curse it all, once again, ye and all who live in Threepenny Wood are cursed to forget this day and relive it each morn ‘til I dine on puddin’!” Urdlen storms out of the clearing into the woods, shouting obscenities as he goes. You wait in your hiding place for the inevitable call to roll up to the fair.`,
-			continue: () => beginNewDay
+			continue: () => beginNewDay,
+			condition: () => dailyConditions.confrontedCyrrollalee === true,
 		},
 	]
 })
