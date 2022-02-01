@@ -128,7 +128,7 @@ const continueButton = (eventName) => {
         newBtn.addEventListener('click', ()=>{newEvent(eventName)}) // give the new button an event listener to start a new event
     }
     optionsBox.appendChild(newBtn) // add it to the optionsBox
-    // buttonColorIsRandom()
+    buttonColorIsRandom()
 }
 
 const advanceTime = (timeTaken) => {
@@ -175,7 +175,7 @@ const newEvent = (eventName) => {
     if (eventName.initialize) {
         eventName.initialize()
     }
-    // buttonColorIsRandom()
+    buttonColorIsRandom()
     returningTo.push(eventName)
 }
 
@@ -312,26 +312,26 @@ historyModal.addEventListener('click', modalClick)
 
 // BUTTON COLOR IS RANDOM!
 
-// const buttonColorIsRandom = () => {
-//     const buttons = document.querySelectorAll('button')
-//     const btnHoverClass = document.querySelector('.randomColor')
+const buttonColorIsRandom = () => {
+    const buttons = document.querySelectorAll('button')
+    const btnHoverClass = document.querySelector('.randomColor')
     
-//     const randomColor = () => {
-//       let color = Math.floor(Math.random()*16777215).toString(16);
-//       event.target.style.backgroundColor = '#' + color
-//     }
+    const randomColor = () => {
+      let color = Math.floor(Math.random()*16777215).toString(16);
+      event.target.style.backgroundColor = '#' + color
+    }
     
-//     const returnColor = () => {
-//       event.target.style.backgroundColor = 'rgb(239, 239, 239)'
-//     }
+    const returnColor = () => {
+      event.target.style.backgroundColor = 'rgb(239, 239, 239)'
+    }
     
-//     for (btn of buttons) {
-//       btn.addEventListener('mouseover', randomColor)
-//     }
-//     for (btn of buttons) {
-//       btn.addEventListener('mouseout', returnColor)
-//     }
-// }
+    for (btn of buttons) {
+      btn.addEventListener('mouseover', randomColor)
+    }
+    for (btn of buttons) {
+      btn.addEventListener('mouseout', returnColor)
+    }
+}
 
 // RANDOM TRINKETS!!!
 
@@ -1649,4 +1649,4 @@ document.documentElement.style.setProperty('--vh', `${vh}px`);
 
 // STUFF AT THE END
 
-// buttonColorIsRandom()
+buttonColorIsRandom()
