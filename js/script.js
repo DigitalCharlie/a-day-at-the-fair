@@ -173,10 +173,10 @@ const newEvent = (eventName) => {
     if(eventName.eventBg) {
         newBg(eventName.eventBg)
     }
+	createOptionButtons(eventName) // create the option buttons for the event
     if (eventName.initialize) {
         eventName.initialize()
     }
-	createOptionButtons(eventName) // create the option buttons for the event
     buttonColorIsRandom()
     returningTo.push(eventName)
 }
@@ -357,7 +357,7 @@ const refreshTrinkets = () => {
 // I made this initially thinking
 const allJokes = [`"After that, I went to work at a calendar factory, but I got fired because I missed a few days."`, `"Then I got a job at a clock factory, but I got fired after putting in a lot of extra hours."`, `"I once went for a job interview at a morgue. The mortician said he was looking for someone responsible. I told him that in my last job, whenever anything went wrong, they said I was responsible. I didn't get the job."`, `"After that, I started a gym, but it didn't work out. So that's how I became a jester – there was almost nothing else left to try!"`, `"Growing up, we never had decent food. Every evening I'd ask what we were having for dinner, and my pop would said the same thing, "leftovers.” Every day it was leftovers! We never found the original meal. That’s not like the food here, which is delicious."`, `"I can’t wait to try that pudding, it looks incredible! Hey, you know what the best thing to put into a pudding is? Your teeth!"`, `"Anyway, I don’t think you’ll keep pudding up with me for much longer, so I’ll bid you good day. May Cyrrollalee, the god of hospitality, be with you all! Farewell!"`]
 
-// FINAL BATTLE
+// FINAL BATTLE — again, out of time so it seems kind of rough but it's working.
 
 const progressFinalBattle = () => {
 	console.log("test")
@@ -1378,7 +1378,7 @@ const edgeOfTheWoods = new FairEvent ({
 			button:`Head back to the orc camp`,
 			text:`It's not terribly difficult for you to find your way back to the orc camp.`,
 			duration:.5,
-			condition: () => permConditions.foundOrcCamp === true && permConditions.orcsWillHelp === false && dailyConChanges.arabellaMissing === false && dailyConditions.disclosedLoopToNanny === false && dailyConditions.confrontedCyrrollalee === false,
+			condition: () => permConditions.foundOrcCamp === true && permConditions.orcsWillHelp === false && dailyConditions.arabellaMissing === false && dailyConditions.disclosedLoopToNanny === false && dailyConditions.confrontedCyrrollalee === false,
 			buttonFunction: () => {
 				if (dailyConditions.arabellaMissing === true) {
 					currentText.lastElementChild.textContent += " It certainly doesn't hurt that it looks like they were dragging something with them."
@@ -1472,7 +1472,8 @@ const caughtInSling = new FairEvent ({
 			buttonFunction: () => {
 				let baseText = currentText.lastElementChild
 				if (adventurers[0].currentTrinket) {
-					baseText.textContent += ` "I have no need for a ` + adventurers[0].currentTrinket `."`
+					let currentTrinket = adventurers[0].currentTrinket
+					baseText.textContent += ` "I have no need for a ` + currentTrinket + `."`
 				} 
 				if (adventurers[0].jokes.length != 0) {
 					baseText.textContent += ` "Your jokes are not amusing. This isn't a time for laughter."`
@@ -1758,13 +1759,13 @@ const permConditions = {
     "piedInFace":false,
     "dodgedPie": false,
     "knowHowToCalmCaric": false,
-    "poppysRoutine":true,
+    "poppysRoutine":false,
     "metEmery":false,
 	"slingTrapTriggered":false,
 	"confrontedCyrrollalee": false,
-	"orcsWillHelp":true,
+	"orcsWillHelp":false,
 	"knowAboutJosie":false,
-	"knowCyrrollalee":true,
+	"knowCyrrollalee":false,
 }
 
 const resetDailyConditions = () => { // for all the daily conditions, set them to false or 0, depending
