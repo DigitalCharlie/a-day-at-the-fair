@@ -20,7 +20,7 @@ const bg = document.getElementById('bg')
 // VARIABLES THAT STRUCTURE THE GAME PLAY
 // should have wrapped it inside of game objects, but I did not.
 
-let dayCount = 0
+let dayCount = 2
 let goodDeeds = 0
 let badDeeds = 0
 let timeOfDay = 7
@@ -124,7 +124,7 @@ const continueButton = (eventName) => {
     clearButtons() // gets rid of all the current buttons
     const newBtn = document.createElement('button') // creates a new button
     newBtn.textContent = "Continue" // makes it so the text of the new button is continue 
-    if (eventName != (beginNewDay || returnToInnAtNight || caughtInSling || orcCamp) && timeOfDay >= 17) {
+    if (eventName != (beginNewDay || returnToInnAtNight || caughtInSling || orcCamp || talkingToIork || inTheCamp) && timeOfDay >= 17) {
         returnToInnBg()
         newBtn.addEventListener('click', ()=>{newEvent(returnToInnAtNight)})
     } else {
@@ -516,7 +516,7 @@ const outsideTheInn = new FairEvent ({
 			text:`You decide that whatever's happening in the wood is more important than the fair.`,
 			duration:1,
 			alreadyDisplayed:false,
-            condition: () => permConditions.slingTrapTriggered === true,
+            condition: () => permConditions.slingTrapTriggered === true && dailyConditions.arabellaMissing === false,
 			continue: () => edgeOfTheWoods
 		},
 	]
@@ -1288,8 +1288,27 @@ const edgeOfTheWoods = new FairEvent ({
 					currentText.lastElementChild.textContent += " It certainly doesn't hurt that it looks like they were dragging something with them."
 				}
 			},
+			continue:() => orcCamp,
+			permConChanges:["foundOrcCamp"]
+		},
+		{
+			button:`Head back to the orc camp`,
+			text:`It's not terribly difficult for you to find your way back to the orc camp.`,
+			duration:.5,
+			condition: () => permConditions.foundOrcCamp === true && permConditions.orcsWillHelp === false && dailyConChanges.arabellaMissing === false,
+			buttonFunction: () => {
+				if (dailyConditions.arabellaMissing === true) {
+					currentText.lastElementChild.textContent += " It certainly doesn't hurt that it looks like they were dragging something with them."
+				}
+			},
 			continue:() => orcCamp
 		},
+		{
+			button:`Tell the orcs it's time`,
+			text:`You call out to the orcs that it's time to get us out of the loop. After a few moments you see Iork come running to greet you. "You had better not be lying, little one."`,
+			condition: () => permConditions.orcsWillHelp === true,
+			dailyConChanges:["orcsAreHelping"]
+		}
 	]
 })
 
@@ -1310,16 +1329,14 @@ const orcCamp = new FairEvent ({
 				let baseText = currentText.lastElementChild
 				if (permConditions.slingTrapTriggered === true) {
 					baseText.textContent += `You deftly sidestep a few sling traps, knowing full well that's not an experience you want, and are able to overhear the conversation happening at the camp.`
-					changeDailyConditions(["closerToCamp"])
-					continueButton(orcCamp)
+					changeDailyConditions(["snuckToCamp"])
+					continueButton(inTheCamp)
 				} else {
 					baseText.textContent += `As you sneak a few paces forward, you suddenly feel yourself flipped wildly through the air and come to rest half a dozen feet off the ground, hanging upside down.`
 					changePermConditions(["slingTrapTriggered"])
 					continueButton(caughtInSling)
 				}
 			},
-			condition: () => dailyConditions.closerToCamp === false,
-			dailyConChanges: ["closerToCamp"],
 		},
 		{
 			button:`Stride out into the camp`,
@@ -1327,8 +1344,8 @@ const orcCamp = new FairEvent ({
 			buttonFunction: () => {
 				let baseText = currentText.lastElementChild
 				if (permConditions.slingTrapTriggered === true) {
-					baseText.textContent += `You deftly sidestep a few sling traps, knowing full well that's not an experience you want, and call out to Iork from the center of camp. He emerges from the tent with a confused look on his face.`
-					changeDailyConditions(["closerToCamp"])
+					baseText.textContent += `You deftly sidestep a few sling traps, knowing full well that's not an experience you want, and call out to Iork from the center of camp.`
+					changeDailyConditions(["walkedToCamp"])
 					continueButton(inTheCamp)
 				} else {
 					baseText.textContent += `As you walk a few paces forward, you suddenly feel yourself flipped wildly through the air and come to rest half a dozen feet off the ground, hanging upside down.`
@@ -1336,7 +1353,6 @@ const orcCamp = new FairEvent ({
 					continueButton(caughtInSling)
 				}
 			},
-			condition: () => dailyConditions.closerToCamp === false,
 		},
 	]
 })
@@ -1384,6 +1400,76 @@ const caughtInSling = new FairEvent ({
 	]
 })
 
+const inTheCamp = new FairEvent ({
+	intro:`Iork emerges from the tent with a confused look on his face. "You're here again. What do you want?"`,
+	eventBg: 'img/orc-camp.jpeg',
+	initialize: () => {
+		let displayText = currentText.lastElementChild
+		if (dailyConditions.walkedToCamp === true) {
+			displayText.textContent = `Iork emerges from the tent with a confused look on his face. "You're here again. What do you want? Did you decide you want to be our meal again?"`
+		} else {
+			displayText.textContent = `From the center of camp you can see into the tent — an older orc is lying on a bedroll holding a bloody rag to his side. The other orcs are by his side, giving him water and holding his hand — more tender than you've ever seen orcs before.`
+			changePermConditions(["knowAboutNic"])
+		}
+	},
+	options: [
+		{
+			button: `Run away`,
+			text: `You change your mind about wanting to be see the orcs again, and start running back to town. You get a few cuts and scrapes running through the forest, but you make it back to town otherwise unscathed.`,
+			duration:2.5,
+			continue: () => outsideTheInn
+		},
+		{
+			button:`Greet Iork`,
+			text: `You and Iork stride towards each other — as you raise your hand in greeting, he rushes forward with a blade and slices across your chest. You look down and see blood blossoming across your tunic and your vision goes dark as you feel a crushing blow come across your face.`,
+			condition: () => dailyConditions.walkedToCamp === true && permConditions.knowAboutNic === false,
+			continue:() => beginNewDay
+		},
+		{
+			button: `Call out to the orcs`,
+			text:`You call out a greeting to the orcs, telling them you want to help their friend. Iork comes out of the tent and looks you straight in the eyes.`,
+			condition: () => dailyConditions.snuckToCamp === true || permConditions.knowAboutNic === true,
+			continue:() => talkingToIork
+		}
+	]
+})
+
+const talkingToIork = new FairEvent ({
+	intro:`From the entrance of the tent, Iork says, "You again. I take it you're as stuck as we are." Your jaw drops a bit as you hear Iork talk about the never-ending Great Pudding Faire. "If you really have a way to help Nic so he won't die again tonight at sundown, let's have it. Otherwise, leave." `,
+	eventBg: 'img/orc-camp.jpeg',
+	options: [
+		{
+			button:`Back away`,
+			text: `Realizing you don't actually have a way to help Nic, you hurry away from the camp. You get a few cuts and scrapes running through the forest, but you make it back to town otherwise unscathed.`,
+			continue:() => outsideTheInn
+		},
+		{
+			button: `Offer healing potion`,
+			text:`He looks you dead in the eyes. "We are not stupid, little gnome. We tried that already."`,
+			buttonFunction: () => {
+				let displayText = currentText.lastElementChild
+				if (dayCount === 4) {
+					displayText.textContent = `He looks you dead in the eyes. "We are not stupid, little gnome. We tried that already. That's why we brought the herbalist today. But at least you tried to help. You may still go without more pain."`
+				} else if (dayCount > 4) {
+					displayText.textContent = `He looks you dead in the eyes. "We are not stupid, little gnome. We tried that already. That's why we brought the herbalist here yesterday or the day before. But at least you tried to help. You may still go without more pain."`
+				}
+			},
+			condition: () => dailyConditions.hasHealingPotion === true
+		},
+		{
+			button: `Talk about the loop`,
+			text: `When you start discussing the loop, Iork's eyebrows raise. After a few moments, he bursts out laughing. "You clearly have no better idea than we do about how to deal with this. If you figure it out, come back then."`,
+			condition: () => permConditions.confrontedCyrrollalee === false
+		},
+			{
+			button: `Talk about the loop`,
+			text: `When you start discussing the loop and Cyrrollalee, Iork's eyebrows raise. "So if we help you and Cyrrollalee when you call for us, Nic's suffering can end? Good. Just call when you need us."`,
+			condition: () => permConditions.confrontedCyrrollalee === true,
+			permConChanges: ["orcsWillHelp"]
+		}
+	]
+})
+
 // LIST OF CONDITIONS, MOSTLY FOR REFERENCE SINCE THEY DON'T NEE TO EXIST UNTIL I CREATE THEM.
 
 const dailyConditions = {
@@ -1406,7 +1492,9 @@ const dailyConditions = {
     "tallfolkTracks":false,
     "declinedEmery":false,
     "savedEmery":false,
-	"closerToCamp":false
+	"snuckToCamp":false,
+	"walkedToCamp": false,
+	"orcsAreHelping":false
 }
 
 const permConditions = {
@@ -1415,7 +1503,9 @@ const permConditions = {
     "knowHowToCalmCaric": false,
     "poppysRoutine":false,
     "metEmery":false,
-	"slingTrapTriggered":false
+	"slingTrapTriggered":false,
+	"confrontedCyrrollalee": false,
+	"orcsWillHelp":false
 }
 
 const resetDailyConditions = () => { // for all the daily conditions, set them to false or 0, depending
