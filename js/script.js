@@ -769,7 +769,7 @@ const returnToInnAtNight = new FairEvent ({
 			alreadyDisplayed:true,
 			continue: () => beginNewDay,
             bg:`img/town-night.jpg`,
-            condition: () => goodDeeds < 4 || (goodDeeds < 3 && dayCount > 5)
+            condition: () => goodDeeds < 4 || (goodDeeds < 3 && dayCount > 5) || (goodDeeds < 2 && dayCount > 7)
 		},
 		{
 			button:`Greet Nanny Cowslip`,
@@ -777,7 +777,7 @@ const returnToInnAtNight = new FairEvent ({
 			duration:0,
 			alreadyDisplayed:true,
             bg:`img/town-night.jpg`,
-            condition: () => goodDeeds >= 4 || (goodDeeds >= 3 && dayCount > 5),
+            condition: () => goodDeeds >= 4 || (goodDeeds >= 3 && dayCount > 5) || (goodDeeds >= 2 && dayCount > 7),
 			continue: () => talkingToCyrrollalee
 		}
 	]
