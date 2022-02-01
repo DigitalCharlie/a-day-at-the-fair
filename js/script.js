@@ -65,12 +65,13 @@ const nameAdventurer = () => {
     } else {
         adventurers.push(new Adventurer("Traveler")) // default if it is blank — this will get used as easter egg dialogue later
     }
+	dayCount = 0
     textBox.classList.add('text-adventure-justify')
-    introText.hidden = true
+    document.getElementById('intro').hidden = true
     currentText.hidden = false
     historyButton.style.opacity = 1
     newEvent(beginNewDay)
-    introText.remove()
+    document.getElementById('intro').remove()
 }
 
 nameAdvBtn.addEventListener('click', nameAdventurer)
@@ -118,9 +119,10 @@ const continueButton = (eventName) => {
     clearButtons() // gets rid of all the current buttons
     const newBtn = document.createElement('button') // creates a new button
     newBtn.textContent = "Continue" // makes it so the text of the new button is continue 
-	const finalEvents = [beginNewDay, returnToInnAtNight, caughtInSling, orcCamp, talkingToIork, inTheCamp, talkingToCyrrollalee, edgeOfTheWoods, confrontingUrdlen]
+	const finalEvents = [beginNewDay, returnToInnAtNight, caughtInSling, orcCamp, talkingToIork, inTheCamp, talkingToCyrrollalee, edgeOfTheWoods, confrontingUrdlen, finalBattle]
     if (dailyConditions.confrontedCyrrollalee === true && timeOfDay >=16.5) {
 		newBtn.addEventListener('click', ()=>{newEvent(edgeOfTheWoods)})
+		timeOfDay = 7
 	} else if (!finalEvents.includes(eventName) && timeOfDay >= 16.5) {
         returnToInnBg()
         newBtn.addEventListener('click', ()=>{newEvent(returnToInnAtNight)})
@@ -153,7 +155,7 @@ const newEvent = (eventName) => {
     if (eventName === beginNewDay) {
         dayCount++ // advance day counter
         timeOfDay = 7 // set time to 7am
-        goodDeeds = 4
+        goodDeeds = 0
         badDeeds = 0
         resetDailyConditions()
         newHistoryDay() // add a new day header in the history bar
@@ -168,13 +170,13 @@ const newEvent = (eventName) => {
     if (eventName.location) {
         partOfTown = eventName.location
     }
-    createOptionButtons(eventName) // create the option buttons for the event
     if(eventName.eventBg) {
         newBg(eventName.eventBg)
     }
     if (eventName.initialize) {
         eventName.initialize()
     }
+	createOptionButtons(eventName) // create the option buttons for the event
     buttonColorIsRandom()
     returningTo.push(eventName)
 }
@@ -354,6 +356,59 @@ const refreshTrinkets = () => {
 // All the jokes!
 // I made this initially thinking
 const allJokes = [`"After that, I went to work at a calendar factory, but I got fired because I missed a few days."`, `"Then I got a job at a clock factory, but I got fired after putting in a lot of extra hours."`, `"I once went for a job interview at a morgue. The mortician said he was looking for someone responsible. I told him that in my last job, whenever anything went wrong, they said I was responsible. I didn't get the job."`, `"After that, I started a gym, but it didn't work out. So that's how I became a jester – there was almost nothing else left to try!"`, `"Growing up, we never had decent food. Every evening I'd ask what we were having for dinner, and my pop would said the same thing, "leftovers.” Every day it was leftovers! We never found the original meal. That’s not like the food here, which is delicious."`, `"I can’t wait to try that pudding, it looks incredible! Hey, you know what the best thing to put into a pudding is? Your teeth!"`, `"Anyway, I don’t think you’ll keep pudding up with me for much longer, so I’ll bid you good day. May Cyrrollalee, the god of hospitality, be with you all! Farewell!"`]
+
+// FINAL BATTLE
+
+const progressFinalBattle = () => {
+	console.log("test")
+	if (dailyConditions.distractionCount >= 2) {
+		console.log("test2")
+		currentText.lastElementChild.textContent += ` But with that distraction, you see a blast of light from over your shoulder and Urdlen's eyes go wide. He begins to open his mouth, but before he can say anything he disappears without any trace left behind.`
+		continueButton(victoryEvent)
+	}
+	console.log("test3")
+}
+
+const victory = () => { // Honestly I ran out of time for this so we'll see how it works
+	clearButtons()
+	clearText()
+	currentText.hidden = true
+	let victorydiv = document.createElement('div')
+	let victoryh1 = document.createElement('h1')
+	let victoryp1 = document.createElement('p')
+	let newGamep = document.createElement('p')
+	let newInput = document.createElement('input')
+	let newButton = document.createElement('button')
+	victorydiv.id = 'intro'
+	victoryh1.textContent = "Congratulations, " + adventurers[0].name + "! You're free!"
+	victoryp1.textContent = "With Urdlen's banishment, Honeypuddle is able to continue with the Great Pudding Feast, and you're finally able to move on from this very, very long day. It took you " + dayCount + " days to escape the loop."
+	let trinketText = " You collected a few trinkets along the way: "
+	if (adventurers[0].trinkets.length > 0) {
+		for (i = 0; i < adventurers[0].trinkets.length; i++) {
+			trinketText += adventurers[0].trinkets[i] + ', '
+		}
+	} else {
+		trinketText = " You didn't buy a single thing at the yard sale."
+	} victoryp1.textContent += trinketText
+	newGamep.textContent = "Name your gnome to play again: "
+	newInput.setAttribute('type', 'text')
+	newInput.id = 'adventurer-name'
+	newButton.id = 'intro-button'
+	newButton.textContent = "Submit"
+	newButton.addEventListener('click', nameAdventurer)
+	newInput.addEventListener('keypress', (e) => {
+		if (e.key == "Enter") {
+			nameAdvBtn.click();
+		}
+	})
+	victorydiv.appendChild(victoryh1)
+	victorydiv.appendChild(victoryp1)
+	victorydiv.appendChild(newGamep)
+	victorydiv.appendChild(newInput)
+	victorydiv.appendChild(newButton)
+	textBox.prepend(victorydiv)
+	resetPermConditions()
+}
 
 // EVENT DATABASE
 // Each has intro text, which displays, a hidden option condition, and then a count of hidden option — which are always the last number of options.
@@ -1289,7 +1344,7 @@ const edgeOfTheWoods = new FairEvent ({
 			baseText.textContent += ` You see her move quickly and decisively into the woods — you'll have to pick up the pace to keep up with her.`
 		}
 		if (dailyConditions.confrontedCyrrollalee === true) {
-			baseText.textContent += ` You see Cyrrollalee waiting for you on the edge of Threepenny Wood. As you approach she smiles and says, "ready when you are!"`
+			baseText.textContent = `As night falls, you head back to the edge of Threepenny Wood to meet with Cyrrollalee and put your plan into action. As you approach she smiles and says, "ready when you are!"`
 		}
 	},
 	options: [
@@ -1334,7 +1389,7 @@ const edgeOfTheWoods = new FairEvent ({
 		{
 			button:`Tell the orcs it's time`,
 			text:`You call out to the orcs that it's time to get us out of the loop. After a few moments you see Iork come running to greet you. "You had better not be lying, little one."`,
-			condition: () => permConditions.orcsWillHelp === true && (dailyConditions.disclosedLoopToNanny === true || permConditions.confrontedCyrrollalee === true),
+			condition: () => permConditions.orcsWillHelp === true && (dailyConditions.disclosedLoopToNanny === true || dailyConditions.confrontedCyrrollalee === true),
 			dailyConChanges:["orcsAreHelping"]
 		},
 		{
@@ -1346,7 +1401,7 @@ const edgeOfTheWoods = new FairEvent ({
 		{
 			button: `Trail Cyrrollalee to her meeting with Urdlen`,
 			text:`You hurry after Cyrrollalee into the Threepenny Wood, trailing her to her daily confrontation with Urdlen.`,
-			condition: () => permConditions.confrontedCyrrollalee === true,
+			condition: () => dailyConditions.confrontedCyrrollalee === true,
 			continue: () => confrontingUrdlen
 		}
 	]
@@ -1570,20 +1625,103 @@ const confrontCyrrollalee = new FairEvent ({
 })
 
 const confrontingUrdlen = new FairEvent ({
-	intro:``,
-	eventBg:`img/blighted-forest.jpg`,
+	intro:`You watch as Nanny Cowslip walks out into the clearing, demanding to know what magic Patcher used to turn Mayor Barleydeew into a frog. Urdlen, almost immediately, says, "come now, Cyrrollalee, you know it's uncouth for us gods to reveal our magics. I might be persuaded to turn him back if you offer me a seat at the Great Pudding Table, however — I know these kind folk worship you, even if you don't reveal who you really are to them. Speaking of, if you don't offer me a seat, I will reveal your true identity for all of them to see!”`,
+	eventBg:`img/blighted-forest.png`,
+	initialize: () => {
+		if (dailyConditions.confrontedCyrrollalee === true) {
+			currentText.lastElementChild.textContent = `You watch as Nanny Cowslip walks out into the clearing, demanding to know what magic Patcher used to turn Mayor Barleydeew into a frog. Urdlen, almost immediately, says, "come now, Cyrrollalee, you know it's uncouth for us gods to reveal our magics. I might be persuaded to turn him back if you offer me a seat at the Great Pudding Table, however — I know these kind folk worship you, even if you don't reveal who you really are to them. If you don't offer me a seat, I will burn down this village! And kidnap the children!`
+		}
+	},
 	options: [
 		{
-			button:`Stay silent`,
+			button:`Continue`,
+			text:`Cyrrollalee responds with a deep sigh, and twirls around in a flash of light, revealing... a halfling woman who looks almost identical to Nanny Cowslip, but with more glow. "You're Urdlen, aren't you — why can't you just stay in your own domain. No matter, you won't be staying here and you certainly won't be coming to the festival." Cyrrollalee begins casting a spell, but just as she begins the motions, Urdlen casually flips his hand, turning Cyrrollalee to stone where she stands. Then, he shrieks the words of his curse: “Once again, ye and all who live in Threepenny Wood are cursed to forget this day and relive it each morn ‘til I dine on puddin’!” Urdlen storms out of the clearing into the woods, shouting obscenities as he goes. You stare in shock and sit open-mouthed until nightfall.`,
+			continue: () => beginNewDay,
+			condition: () => dailyConditions.confrontedCyrrollalee === false,
 		},
 		{
-			button: `Plead for mercy`,
+			button: `Run out and start distracting Urdlen`,
+			text:`You dash out from your hiding spot and come face to face with a very angry, very confused gnome whose claws are much sharper up close than you realized.`,
+			continue: () => finalBattle
 		},
 		{
-			button: `Try to bargain`,
-		}
+			button: `Stay hidden`,
+			text:`Cyrrollalee responds with a deep sigh, and twirls around in a flash of light, revealing... her true, glowy self. "You're Urdlen, aren't you — why can't you just stay in your own domain. No matter, you won't be staying here and you certainly won't be coming to the festival." Cyrrollalee looks around, confused, then begins casting her spell — but just as she begins the motions, Urdlen casually flips his hand, turning Cyrrollalee to stone where she stands. Then, he shrieks the words of his curse: “Gods curse it all, once again, ye and all who live in Threepenny Wood are cursed to forget this day and relive it each morn ‘til I dine on puddin’!” Urdlen storms out of the clearing into the woods, shouting obscenities as he goes. You wait in your hiding place for the inevitable call to roll up to the fair.`,
+			continue: () => beginNewDay
+		},
 	]
 })
+
+const finalBattle = new FairEvent ({
+	intro:`Standing before Urdlen, you rack your brain trying to think of all the ways you have to distract him — and you hope it's enough.`,
+	eventBg:`img/blighted-forest.png`,
+	initialize: () => {
+		finalBattle.options[1].text = `You take out your ` + adventurers[0].currentTrinket + ` and show it Urdlen — he looks at it, and back to you, more confused why you're showing it to him than anything.`
+	},
+	options: [
+		{
+			button:`Run in fear`,
+			text:`You don't think you can do this today — you just weren't prepared with enough material to distract Urdlen for long enough. "Here's to hoping tomorrow goes better," you think as Urdlen's claws rake across your back.`,
+			continue: () => beginNewDay
+		},
+		{
+			button:`Show off a trinket`,
+			text: `You take out your yard sale purchase and show it Urdlen — he looks at it, and back to you, more confused why you're showing it to him than anything.`,
+			condition: () => adventurers[0].currentTrinket != '',
+			buttonFunction: () => progressFinalBattle(),
+			dailyConChanges:["distractionCount"]
+		},
+		{
+			button:`Tell one of Poppy's jokes`,
+			text:`You start Poppy's routine strong — "I used to work in a bank, but I lost my job: a woman asked me to check her balance and I pushed her over" and get through a couple of jokes before Urdlen groans loudly — which is the signal to only tell one more line. `,
+			condition: () => permConditions.poppysRoutine === true,
+			buttonFunction: () => progressFinalBattle(),
+			dailyConChanges:["distractionCount"]
+		},
+		{
+			button:`Start doing a puppet show`,
+			text:`You try using your hands to do a retelling of the Legend of Mystery Hollow, but it barely gets off the ground — puppets are better than hands.`,
+			condition: () => permConditions.metEmery === true,
+			buttonFunction: () => progressFinalBattle(),
+			dailyConChanges:["distractionCount"]
+		},
+		{
+			button:`Offer your healing potion`,
+			text:`You take out a vial of red liquid and proffer it to Urdlen, who takes it and downs it in one swig. "These things are like candy, so sweet."`,
+			condition: () => dailyConditions.hasHealingPotion === true,
+			buttonFunction: () => progressFinalBattle(),
+			dailyConChanges:["distractionCount"]
+		},
+		{
+			button:`Offer your potion of poison`,
+			text:`You take out a vial of red liquid and proffer it to Urdlen, who takes it and downs it in one swig. He looks at you strangely for a moment and then leans in close. "Did you really think such weak poison could hurt a god?" And proceeds to spit the poison on your face — which erupts in boils on contact. At least Urdlen thinks it's funny.`,
+			condition: () => dailyConditions.hasPotionOfPoison === true,
+			buttonFunction: () => progressFinalBattle(),
+			dailyConChanges:["distractionCount"]
+		},
+		{
+			button:`Call for Iork's help`,
+			text:`You give the signal to Iork for his orcs to come charging in — doing more to distract Urdlen than you've been able to manage because, well, there are 4 of them.`,
+			condition: () => dailyConditions.orcsAreHelping === true || permConditions.orcsWillHelp === true,
+			buttonFunction: () => progressFinalBattle(),
+			dailyConChanges:["distractionCount"]
+		},
+		{
+			button:`Show the plate at Urdlen`,
+			text:`You sigh, thinking about the 4 hours you waited for this commemorative plate — but you know the artistry might buy you a few seconds. And if it doesn't, well, you can always throw it at him.`,
+			condition: () => dailyConditions.boughtPlate === true,
+			buttonFunction: () => progressFinalBattle(),
+			dailyConChanges:["distractionCount"]
+		},
+	]
+})
+
+const victoryEvent = new FairEvent ({
+	intro:``,
+	eventBg:`img/the-faire.png`,
+	initialize: () => victory()
+})
+
 
 // LIST OF CONDITIONS, MOSTLY FOR REFERENCE SINCE THEY DON'T NEE TO EXIST UNTIL I CREATE THEM.
 
@@ -1612,20 +1750,21 @@ const dailyConditions = {
 	"orcsAreHelping":false,
 	"paidForJosie":false,
 	"disclosedLoopToNanny":false,
-	"confrontedCyrrollalee":false
+	"confrontedCyrrollalee":false,
+	"distractionCount": 0
 }
 
 const permConditions = {
     "piedInFace":false,
     "dodgedPie": false,
     "knowHowToCalmCaric": false,
-    "poppysRoutine":false,
+    "poppysRoutine":true,
     "metEmery":false,
 	"slingTrapTriggered":false,
 	"confrontedCyrrollalee": false,
-	"orcsWillHelp":false,
+	"orcsWillHelp":true,
 	"knowAboutJosie":false,
-	"knowCyrrollalee":false
+	"knowCyrrollalee":true,
 }
 
 const resetDailyConditions = () => { // for all the daily conditions, set them to false or 0, depending
