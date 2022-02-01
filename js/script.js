@@ -1642,6 +1642,7 @@ const confrontingUrdlen = new FairEvent ({
 			text:`Cyrrollalee responds with a deep sigh, and twirls around in a flash of light, revealing... a halfling woman who looks almost identical to Nanny Cowslip, but with more glow. "You're Urdlen, aren't you — why can't you just stay in your own domain. No matter, you won't be staying here and you certainly won't be coming to the festival." Cyrrollalee begins casting a spell, but just as she begins the motions, Urdlen casually flips his hand, turning Cyrrollalee to stone where she stands. Then, he shrieks the words of his curse: “Once again, ye and all who live in Threepenny Wood are cursed to forget this day and relive it each morn ‘til I dine on puddin’!” Urdlen storms out of the clearing into the woods, shouting obscenities as he goes. You stare in shock and sit open-mouthed until nightfall.`,
 			continue: () => beginNewDay,
 			condition: () => dailyConditions.confrontedCyrrollalee === false,
+			permConChanges:["knowCyrrollalee"]
 		},
 		{
 			button: `Run out and start distracting Urdlen`,
