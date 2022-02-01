@@ -119,7 +119,7 @@ const continueButton = (eventName) => {
     clearButtons() // gets rid of all the current buttons
     const newBtn = document.createElement('button') // creates a new button
     newBtn.textContent = "Continue" // makes it so the text of the new button is continue 
-	const finalEvents = [beginNewDay, returnToInnAtNight, caughtInSling, orcCamp, talkingToIork, inTheCamp, talkingToCyrrollalee, edgeOfTheWoods, confrontingUrdlen, finalBattle]
+	const finalEvents = [beginNewDay, returnToInnAtNight, caughtInSling, orcCamp, talkingToIork, inTheCamp, talkingToCyrrollalee, edgeOfTheWoods, confrontingUrdlen, finalBattle, victoryEvent]
     if (dailyConditions.confrontedCyrrollalee === true && timeOfDay >=16.5) {
 		newBtn.addEventListener('click', ()=>{newEvent(edgeOfTheWoods)})
 		timeOfDay = 7
@@ -361,8 +361,7 @@ const allJokes = [`"After that, I went to work at a calendar factory, but I got 
 
 const progressFinalBattle = () => {
 	console.log("test")
-	if (dailyConditions.distractionCount >= 2) {
-		console.log("test2")
+	if (dailyConditions.distractionCount >= 4) {
 		currentText.lastElementChild.textContent += ` But with that distraction, you see a blast of light from over your shoulder and Urdlen's eyes go wide. He begins to open his mouth, but before he can say anything he disappears without any trace left behind.`
 		continueButton(victoryEvent)
 	}
