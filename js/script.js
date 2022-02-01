@@ -20,7 +20,7 @@ const bg = document.getElementById('bg')
 // VARIABLES THAT STRUCTURE THE GAME PLAY
 // should have wrapped it inside of game objects, but I did not.
 
-let dayCount = 2
+let dayCount = 0
 let goodDeeds = 0
 let badDeeds = 0
 let timeOfDay = 7
