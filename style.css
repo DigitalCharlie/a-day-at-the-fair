@@ -10,14 +10,14 @@ body {
 
 .fade-in {
     opacity: 1!important;
-    /* transition-duration: 1.5s;
-    transition-timing-function: ease-in-out; */
+    transition-duration: 1.5s;
+    transition-timing-function: ease-in-out;
 }
 
 #text-adventure {
-    /* opacity:0;
+    opacity:0;
     transition-duration: 2.5s;
-    transition-delay: 2s; */
+    transition-delay: 2s;
 }
 
 main {
